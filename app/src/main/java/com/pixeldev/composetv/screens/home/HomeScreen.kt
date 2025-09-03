@@ -1,7 +1,9 @@
 package com.pixeldev.composetv.screens.home
 
-import android.os.Process
+
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -9,28 +11,79 @@ import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.outlined.LocalFireDepartment
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.DrawerValue
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.ModalNavigationDrawer
 import androidx.tv.material3.NavigationDrawer
 import androidx.tv.material3.NavigationDrawerItem
 import androidx.tv.material3.Text
 import androidx.tv.material3.rememberDrawerState
 import androidx.tv.material3.*
+import coil.compose.rememberAsyncImagePainter
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHostController) {
@@ -44,7 +97,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHos
     BackHandler(enabled = true) {
         if (showExitDialog.value) {
             // Exit the app
-            Process.killProcess(Process.myPid())
+            android.os.Process.killProcess(android.os.Process.myPid())
         } else {
             showExitDialog.value = true
         }
@@ -58,98 +111,8 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHos
     val genresMovieState by viewModel.genresMoviesResponses.collectAsState()
     val moviesLazyPagingItems = viewModel.popularAllListState.collectAsLazyPagingItems()
 
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    var selectedScreen by remember { mutableStateOf(TvScreen.Home) }
 
-    NavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            Column(modifier = Modifier.padding(16.dp)) {
-                TvScreen.entries.forEach { screen ->
-                    NavigationDrawerItem(
-                        selected = screen == selectedScreen,
-                        onClick = {
-                            selectedScreen = screen
-                            drawerState.setValue(DrawerValue.Closed)
-                        },
-                        leadingContent = { /* optional icon or spacer */ },
-                        content = { Text(text = screen.title) }
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-            }
-        }
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            when (selectedScreen) {
-                TvScreen.Home -> MainScreen()
-                TvScreen.Trending -> TrendingScreen()
-                TvScreen.Popular -> PopularScreen()
-                TvScreen.Favorite -> FavoriteScreen()
-                TvScreen.Settings -> SettingsScreen()
-            }
-        }
-    }
+    SampleModalNavigationDrawerWithGradientScrim()
+    //TvApp()
 
-}
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-fun TvScreenContent(title: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFCCCCCC)), // light gray
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.Black
-            )
-            Button(
-                onClick = { /* handle action */ }
-            ) {
-                Text("TV Button")
-            }
-        }
-    }
-}@Composable
-fun MainScreen() {
-    TvScreenContent(title = "Home")
-}
-
-@Composable
-fun TrendingScreen() {
-    TvScreenContent(title = "Trending")
-}
-
-@Composable
-fun PopularScreen() {
-    TvScreenContent(title = "Popular")
-}
-
-@Composable
-fun FavoriteScreen() {
-    TvScreenContent(title = "Favorite")
-}
-
-@Composable
-fun SettingsScreen() {
-    TvScreenContent(title = "Settings")
-}
-
-
-enum class TvScreen(val title: String) {
-    Home("Home"),
-    Trending("Trending"),
-    Popular("Popular"),
-    Favorite("Favorite"),
-    Settings("Settings")
 }

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,6 +10,14 @@ plugins {
     id ("org.jetbrains.kotlin.plugin.serialization")
 
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+val apiKey: String = localProperties.getProperty("API_KEY") ?: ""
 android {
     namespace = "com.pixeldev.composetv"
     compileSdk = 36
@@ -18,9 +28,10 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        buildConfigField("String", "API_KEY", "\"${apiKey}\"")
 
     }
-
+    android.buildFeatures.buildConfig = true
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -54,6 +65,7 @@ dependencies {
     implementation(libs.androidx.tv.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.material.icons.extended)
 
 
     // Lifecycle & ViewModel

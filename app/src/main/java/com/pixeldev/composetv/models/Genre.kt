@@ -1,13 +1,15 @@
 package com.pixeldev.composetv.models
 
 import android.os.Parcelable
-import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Parcelize
 data class Genre(
-    @SerializedName("id")
+    @SerialName("id")
     val id: Int?,
-    @SerializedName("name")
+    @SerialName("name")
     val name: String
 ): Parcelable

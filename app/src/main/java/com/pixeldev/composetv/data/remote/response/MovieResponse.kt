@@ -1,15 +1,19 @@
 package com.pixeldev.composetv.data.remote.response
 
 import com.pixeldev.composetv.models.Movies
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
+@Serializable
 data class MovieResponse(
-    @SerializedName("page")
+    @SerialName("page")
     val page: Int,
-    @SerializedName("results")
+    @SerialName("results")
      val results: List<Movies>,
-    @SerializedName("total_pages")
+    @SerialName("total_pages")
     val totalPages: Int,
-    @SerializedName("total_results")
+    @SerialName("total_results")
     val totalResults: Int
 )

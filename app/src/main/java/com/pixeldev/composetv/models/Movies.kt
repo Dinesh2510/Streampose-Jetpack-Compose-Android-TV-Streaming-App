@@ -3,41 +3,44 @@ package com.pixeldev.composetv.models
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Parcelize
+@Serializable
 data class Movies(
-    @SerializedName("adult")
+    @SerialName("adult")
     val adult: Boolean,
-    @SerializedName("backdrop_path")
+    @SerialName("backdrop_path")
     val backdropPath: String?,
-    @SerializedName("poster_path")
+    @SerialName("poster_path")
     val posterPath: String?,
-    @SerializedName("genre_ids")
+    @SerialName("genre_ids")
     val genreIds: List<Int>?,
-    @SerializedName("genres")
+    @SerialName("genres")
     val genres: List<Genre>?,
-    @SerializedName("media_type")
+    @SerialName("media_type")
     val mediaType: String?,
-    @SerializedName("id")
+    @SerialName("id")
     val id: Int,
-    @SerializedName("imdb_id")
+    @SerialName("imdb_id")
     val imdbId: String?,
-    @SerializedName("original_language")
+    @SerialName("original_language")
     val originalLanguage: String,
-    @SerializedName("overview")
+    @SerialName("overview")
     val overview: String,
-    @SerializedName("popularity")
+    @SerialName("popularity")
     val popularity: Double,
-    @SerializedName("release_date", alternate = ["first_air_date"])
+    @SerialName("release_date")
     val releaseDate: String,
-    @SerializedName("runtime")
+    @SerialName("runtime")
     val runtime: Int?,
-    @SerializedName("title", alternate = ["name"])
+    @SerialName("title")
     val title: String,
-    @SerializedName("video")
+    @SerialName("video")
     val video: Boolean,
-    @SerializedName("vote_average")
+    @SerialName("vote_average")
     val voteAverage: Double,
-    @SerializedName("vote_count")
-    val voteCount: Int
+    @SerialName("vote_count")
+    val voteCount: Int,
 ) : Parcelable
