@@ -70,6 +70,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.DrawerValue
@@ -82,27 +83,18 @@ import androidx.tv.material3.Text
 import androidx.tv.material3.rememberDrawerState
 import androidx.tv.material3.*
 import coil.compose.rememberAsyncImagePainter
+import com.pixeldev.composetv.R
+import com.pixeldev.composetv.screens.ClassicCardUI
+import com.pixeldev.composetv.screens.CompactCardUi
+import com.pixeldev.composetv.screens.PillIndicatorTabRow
+import com.pixeldev.composetv.screens.StandardCardContainerUI
+import com.pixeldev.composetv.screens.WideCardContainerUI
+import com.pixeldev.composetv.screens.WideClassicCardUI
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHostController) {
-    val showExitDialog = remember { mutableStateOf(false) }
-    //Exit Dialog Code
-    if (showExitDialog.value) {
-        /*IncludeApp().showExitDialog {
-            showExitDialog.value = false
-        }*/
-    }
-    BackHandler(enabled = true) {
-        if (showExitDialog.value) {
-            // Exit the app
-            android.os.Process.killProcess(android.os.Process.myPid())
-        } else {
-            showExitDialog.value = true
-        }
-    }
-
 
     val discoveryMovieState by viewModel.discoveryMovieResponses.collectAsState()
     val trendingMovieState by viewModel.trendingMovieResponses.collectAsState()
@@ -110,9 +102,58 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHos
     val upcomingMovieState by viewModel.upcomingMoviesResponses.collectAsState()
     val genresMovieState by viewModel.genresMoviesResponses.collectAsState()
     val moviesLazyPagingItems = viewModel.popularAllListState.collectAsLazyPagingItems()
+    val categories = (1..10).map { "Category $it" }
 
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface),
+        contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(32.dp)
+    ) {
+        item(contentType = "FeaturedMoviesCarousel") {
+            PillIndicatorTabRow()
 
-    SampleModalNavigationDrawerWithGradientScrim()
-    //TvApp()
+            FeaturedMoviesCarousel(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(324.dp)
+            )
+        }
+        item {/*
+            WideClassicCardUI()
+            WideCardContainerUI()
+            ClassicCardUI()
+            StandardCardContainerUI()
+            CompactCardUi()*/
+        }
+
+        val categories = (1..10).map { "Category $it" }
+
+        items(categories.size) { category ->
+            Text(
+                text = categories[category],
+                color = Color.White,
+                modifier = Modifier.padding(start = 24.dp, bottom = 8.dp)
+            )
+            Spacer(Modifier.height(8.dp))
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 0.dp), // Or remove this line
+                contentPadding = PaddingValues(start = 24.dp, end = 24.dp), // Control padding here
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(20) { index ->
+                    TvCardItem(
+                        title = "$category - Item ${index + 1}",
+                        imageUrl = "https://picsum.photos/seed/${category.hashCode()}$index/300/200"
+                    )
+                }
+            }
+
+        }
+
+    }
 
 }

@@ -19,7 +19,7 @@ fun SplashScreen(
     // Navigate after checking saved login
     LaunchedEffect(Unit) {
         delay(1500) // Optional splash delay for smoother transition
-        navController.navigate(Screen.Home.route) {
+        navController.navigate(Screen.DashBoardScreen.route) {
             popUpTo(Screen.Splash.route) { inclusive = true }
         }
     }
