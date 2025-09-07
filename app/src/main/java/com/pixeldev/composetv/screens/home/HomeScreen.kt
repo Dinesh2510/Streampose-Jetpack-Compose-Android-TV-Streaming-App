@@ -1,9 +1,7 @@
 package com.pixeldev.composetv.screens.home
 
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -11,87 +9,29 @@ import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material.icons.outlined.LocalFireDepartment
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusOrder
-import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.Button
-import androidx.tv.material3.DrawerValue
-import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.ModalNavigationDrawer
-import androidx.tv.material3.NavigationDrawer
-import androidx.tv.material3.NavigationDrawerItem
 import androidx.tv.material3.Text
-import androidx.tv.material3.rememberDrawerState
 import androidx.tv.material3.*
-import coil.compose.rememberAsyncImagePainter
-import com.pixeldev.composetv.R
-import com.pixeldev.composetv.screens.ClassicCardUI
-import com.pixeldev.composetv.screens.CompactCardUi
-import com.pixeldev.composetv.screens.PillIndicatorTabRow
-import com.pixeldev.composetv.screens.StandardCardContainerUI
-import com.pixeldev.composetv.screens.WideCardContainerUI
-import com.pixeldev.composetv.screens.WideClassicCardUI
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHostController) {
@@ -111,8 +51,10 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHos
         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
+        item() {
+            HomeTopBar()
+        }
         item(contentType = "FeaturedMoviesCarousel") {
-            PillIndicatorTabRow()
 
             FeaturedMoviesCarousel(
                 modifier = Modifier
@@ -126,6 +68,8 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHos
             ClassicCardUI()
             StandardCardContainerUI()
             CompactCardUi()*/
+          //  SampleImmersiveList()
+
         }
 
         val categories = (1..10).map { "Category $it" }
@@ -157,3 +101,48 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHos
     }
 
 }
+@Composable
+fun SampleImmersiveList() {
+    val items = remember { listOf(Color.Red, Color.Green, Color.Yellow) }
+    val selectedItem = remember { mutableStateOf<Color?>(null) }
+
+    // Container
+    Box(modifier = Modifier.fillMaxWidth().height(400.dp)) {
+        val bgColor = selectedItem.value
+
+        // Background
+        if (bgColor != null) {
+            Box(modifier = Modifier.fillMaxWidth().aspectRatio(20f / 7).background(bgColor)) {}
+        }
+
+        // Rows
+        LazyRow(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(20.dp),
+        ) {
+            items(items) { color ->
+                Surface(
+                    onClick = {},
+                    modifier =
+                        Modifier.width(200.dp).aspectRatio(16f / 9).onFocusChanged {
+                            if (it.hasFocus) {
+                                selectedItem.value = color
+                            }
+                        },
+                    colors =
+                        ClickableSurfaceDefaults.colors(
+                            containerColor = color,
+                            focusedContainerColor = color,
+                        ),
+                    border =
+                        ClickableSurfaceDefaults.border(
+                            focusedBorder =
+                                Border(border = BorderStroke(2.dp, Color.White), inset = 4.dp)
+                        ),
+                ) {}
+            }
+        }
+    }
+}
+

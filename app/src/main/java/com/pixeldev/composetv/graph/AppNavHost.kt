@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Slideshow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -33,6 +36,7 @@ import androidx.tv.material3.NavigationDrawer
 import androidx.tv.material3.NavigationDrawerItem
 import androidx.tv.material3.Text
 import androidx.tv.material3.rememberDrawerState
+import com.pixeldev.composetv.screens.categories.CategoryScreen
 import com.pixeldev.composetv.screens.home.HomeScreen
 import com.pixeldev.composetv.screens.home.Page
 import com.pixeldev.composetv.screens.home.PageContent
@@ -55,20 +59,23 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         }
     }
 }
+
 @Composable
 fun DashBoardScreen(navController: NavHostController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    var selectedPageIndex by remember { mutableIntStateOf(0) }
+    var selectedPageIndex by remember { mutableIntStateOf(1) }
 
     val innerNavController = rememberNavController() // ✅ new navController for inner NavHost
 
     val pages = listOf(
-        Page("Home", Icons.Default.Home),
         Page("Search", Icons.Default.Search),
-        Page("Favorites", Icons.Default.Favorite),
+        Page("Home", Icons.Default.Home),
+        Page("Categories", Icons.Default.Category),
+        Page("Movies", Icons.Default.Movie),
+        Page("Shows", Icons.Default.Slideshow),
+        Page("Favorite", Icons.Default.Favorite),
         Page("Settings", Icons.Default.Settings),
-        Page("Profile", Icons.Default.Person)
     )
 
     NavigationDrawer(
@@ -76,7 +83,7 @@ fun DashBoardScreen(navController: NavHostController) {
         drawerContent = {
             Column(
                 Modifier
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.background)
                     .fillMaxHeight()
                     .padding(16.dp)
                     .selectableGroup(),
@@ -89,15 +96,18 @@ fun DashBoardScreen(navController: NavHostController) {
                         onClick = {
                             selectedPageIndex = index
                             coroutineScope.launch {
-                                drawerState.setValue(DrawerValue.Closed) }
+                                drawerState.setValue(DrawerValue.Closed)
+                            }
                             // navigate inside the drawer
                             innerNavController.navigate(
                                 when (index) {
-                                    0 -> Screen.HomeScreen.route
-                                    1 -> Screen.SearchScreen.route
-                                    2 -> Screen.FavoritesScreen.route
-                                    3 -> Screen.SettingsScreen.route
-                                    else -> Screen.ProfileScreen.route
+                                    0 -> Screen.SearchScreen.route
+                                    1 -> Screen.HomeScreen.route
+                                    2 -> Screen.CategoriesScreen.route
+                                    3 -> Screen.MoviesScreen.route
+                                    4 -> Screen.ShowsScreen.route
+                                    5-> Screen.FavoritesScreen.route
+                                    else -> Screen.SettingsScreen.route
                                 }
                             )
                         },
@@ -127,6 +137,15 @@ fun DashBoardScreen(navController: NavHostController) {
             }
             composable(Screen.ProfileScreen.route) {
                 TvScreenContent("ProfileScreen")
+            }
+            composable (Screen.ShowsScreen.route) {
+                TvScreenContent("ShowsScreen")
+            }
+            composable (Screen.MoviesScreen.route) {
+                TvScreenContent("MoviesScreen")
+            }
+            composable (Screen.CategoriesScreen.route) {
+                CategoryScreen()
             }
         }
     }

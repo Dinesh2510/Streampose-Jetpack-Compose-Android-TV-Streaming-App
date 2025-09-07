@@ -91,7 +91,7 @@ fun FeaturedMoviesCarousel(
 
     Carousel(
         modifier = modifier
-            .padding(8.dp)
+            .padding(0.dp)//8
             .border(
                 width = 3.dp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),

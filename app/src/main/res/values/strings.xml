@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Compose TV YT</string>
+    <string name="app_name">Streamose</string>
+    <!--Streampose
+
+Stream + Compose
+Directly ties streaming and Jetpack Compose in a unique way.-->
 </resources>
