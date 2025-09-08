@@ -177,12 +177,13 @@ private fun CarouselItemForeground(
             Text(
                 text = "movie.name",
                 style = MaterialTheme.typography.displayMedium.copy(
-                    shadow = Shadow(
-                        color = Color.Black.copy(alpha = 0.5f),
+                    /*shadow = Shadow(
+                        color = Color.White.copy(alpha = 0.5f),
                         offset = Offset(x = 2f, y = 4f),
                         blurRadius = 2f
-                    )
+                    )*/
                 ),
+                color = Color.White,
                 maxLines = 1
             )
             Text(

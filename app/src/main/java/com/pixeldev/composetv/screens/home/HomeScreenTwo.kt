@@ -552,10 +552,10 @@ fun TvCategoriesScreen() {
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(20) { index ->
-                    TvCardItem(
+                   /* TvCardItem(
                         title = "$category - Item ${index + 1}",
                         imageUrl = "https://picsum.photos/seed/${category.hashCode()}$index/300/200"
-                    )
+                    )*/
                 }
             }
 
@@ -566,10 +566,11 @@ fun TvCategoriesScreen() {
 @Composable
 fun TvCardItem(
     title: String,
-    imageUrl: String
+    imageUrl: String,
+    onClickPressed: () -> Unit,
 ) {
     CompactCard(
-        onClick = { },
+        onClick = {onClickPressed() },
         modifier = Modifier
             .width(180.dp),
         image = {

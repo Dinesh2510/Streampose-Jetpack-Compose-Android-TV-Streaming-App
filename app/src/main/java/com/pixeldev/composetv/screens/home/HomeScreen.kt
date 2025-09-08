@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import androidx.tv.material3.*
+import com.pixeldev.composetv.graph.Screen
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHostController) {
@@ -92,7 +93,9 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHos
                     TvCardItem(
                         title = "$category - Item ${index + 1}",
                         imageUrl = "https://picsum.photos/seed/${category.hashCode()}$index/300/200"
-                    )
+                    ){
+                        navController.navigate(Screen.MovieDetails.route)
+                    }
                 }
             }
 

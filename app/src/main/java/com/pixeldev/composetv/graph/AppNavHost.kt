@@ -37,6 +37,7 @@ import androidx.tv.material3.NavigationDrawerItem
 import androidx.tv.material3.Text
 import androidx.tv.material3.rememberDrawerState
 import com.pixeldev.composetv.screens.categories.CategoryScreen
+import com.pixeldev.composetv.screens.details.MovieDetailsScreen
 import com.pixeldev.composetv.screens.home.HomeScreen
 import com.pixeldev.composetv.screens.home.Page
 import com.pixeldev.composetv.screens.home.PageContent
@@ -57,6 +58,14 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         }
         composable(Screen.UserDetails.route) {
 
+        }
+        composable(Screen.MovieDetails.route) {   // ✅ new screen
+            MovieDetailsScreen(
+                onBackPressed = { navController.popBackStack() },
+                goToMoviePlayer = {
+                    // TODO: handle play action, maybe navigate to player
+                }
+            )
         }
     }
 }
@@ -107,7 +116,7 @@ fun DashBoardScreen(navController: NavHostController) {
                                     2 -> Screen.CategoriesScreen.route
                                     3 -> Screen.MoviesScreen.route
                                     4 -> Screen.ShowsScreen.route
-                                    5-> Screen.FavoritesScreen.route
+                                    5 -> Screen.FavoritesScreen.route
                                     else -> Screen.SettingsScreen.route
                                 }
                             )
@@ -139,13 +148,13 @@ fun DashBoardScreen(navController: NavHostController) {
             composable(Screen.ProfileScreen.route) {
                 TvScreenContent("ProfileScreen")
             }
-            composable (Screen.ShowsScreen.route) {
+            composable(Screen.ShowsScreen.route) {
                 TvScreenContent("ShowsScreen")
             }
-            composable (Screen.MoviesScreen.route) {
+            composable(Screen.MoviesScreen.route) {
                 MoviesContentScreen()
             }
-            composable (Screen.CategoriesScreen.route) {
+            composable(Screen.CategoriesScreen.route) {
                 CategoryScreen()
             }
         }
