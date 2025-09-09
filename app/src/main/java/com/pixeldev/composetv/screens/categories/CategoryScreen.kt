@@ -56,13 +56,13 @@ fun CategoryScreen() {
         // onScroll(shouldShowTopBar)
         Log.d("TAG", "CategoryScreen: shouldShowTopBar")
     }
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "Movie Categories",
             style = MaterialTheme.typography.headlineMedium,
             color = Color.White,
             modifier = Modifier
-                .padding(16.dp)
+                .padding(vertical = 24.dp)
         )
 
         LazyVerticalGrid(
@@ -80,14 +80,14 @@ fun CategoryScreen() {
                     modifier = Modifier
                         .padding(8.dp)
                         .aspectRatio(16 / 9f)
-                        /*.onFocusChanged {
-                            isFocused = it.isFocused || it.hasFocus
+                    /*.onFocusChanged {
+                        isFocused = it.isFocused || it.hasFocus
+                    }
+                    .focusProperties {
+                        if (index % gridColumns == 0) {
+                            left = FocusRequester.Cancel
                         }
-                        .focusProperties {
-                            if (index % gridColumns == 0) {
-                                left = FocusRequester.Cancel
-                            }
-                        }*/
+                    }*/
                 ) {
                     val itemAlpha by animateFloatAsState(
                         targetValue = if (isFocused) .6f else 0.2f,
@@ -96,13 +96,11 @@ fun CategoryScreen() {
                     val textColor = if (isFocused) Color.White else Color.White
 
                     Box(contentAlignment = Alignment.Center) {
-                        Box(modifier = Modifier.alpha(itemAlpha)) {
-                            GradientBg()
-                        }
+                        GradientBg()
                         Text(
                             text = dummyItems[index],
                             style = MaterialTheme.typography.titleMedium.copy(
-                                color = textColor,
+                                color = Color.White
                             )
                         )
                     }

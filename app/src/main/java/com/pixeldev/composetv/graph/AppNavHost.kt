@@ -44,6 +44,7 @@ import com.pixeldev.composetv.screens.home.PageContent
 import com.pixeldev.composetv.screens.home.TvCategoriesScreen
 import com.pixeldev.composetv.screens.home.TvScreenContent
 import com.pixeldev.composetv.screens.movie.MoviesContentScreen
+import com.pixeldev.composetv.screens.setting.SettingScreen
 import com.pixeldev.composetv.screens.splash.SplashScreen
 import kotlinx.coroutines.launch
 
@@ -123,7 +124,7 @@ fun DashBoardScreen(navController: NavHostController) {
                         },
                         leadingContent = { Icon(page.icon, contentDescription = page.title) }
                     ) {
-                        Text(page.title, color = Color.White)
+                        Text(page.title)
                     }
                 }
             }
@@ -143,7 +144,7 @@ fun DashBoardScreen(navController: NavHostController) {
                 PageContent(1)
             }
             composable(Screen.SettingsScreen.route) {
-                TvScreenContent("SettingsScreen")
+                SettingScreen()
             }
             composable(Screen.ProfileScreen.route) {
                 TvScreenContent("ProfileScreen")

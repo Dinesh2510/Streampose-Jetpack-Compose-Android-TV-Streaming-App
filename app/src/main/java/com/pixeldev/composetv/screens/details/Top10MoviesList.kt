@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.animation.AnimatedContent
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.pixeldev.composetv.screens.movie.Movie
 
 
 import androidx.compose.animation.AnimatedVisibility
@@ -102,7 +101,7 @@ fun Top10MoviesList(
     val sectionTitle = if (isListFocused) {
         null
     } else {
-        stringResource(R.string.app_name)
+        stringResource(R.string.trending)
     }
 
     ImmersiveList(
@@ -331,6 +330,7 @@ fun ImmersiveListMoviesRow(
             Text(
                 text = title,
                 style = titleStyle,
+                color = Color.White,
                 modifier = Modifier
                     .alpha(1f)
                     .padding(start = startPadding)

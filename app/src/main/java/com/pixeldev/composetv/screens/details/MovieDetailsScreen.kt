@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -61,11 +62,13 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ClassicCard
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.ShapeDefaults
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import com.google.jetstream.presentation.utils.TitleValueText
 import com.google.jetstream.presentation.utils.rememberChildPadding
 import com.pixeldev.composetv.R
+import com.pixeldev.composetv.screens.common.StandardCardContainerUI
 
 object MovieDetailsScreen {
     const val MovieIdBundleKey = "movieId"
@@ -78,7 +81,7 @@ fun MovieDetailsScreen(
 ) {
 
 
-  Details(
+    Details(
         goToMoviePlayer = goToMoviePlayer,
         onBackPressed = onBackPressed,
         modifier = Modifier
@@ -169,7 +172,6 @@ private fun Details(
 private val BottomDividerPadding = PaddingValues(vertical = 48.dp)
 
 
-
 @Composable
 fun RelatedMoviesSection() {
     Column(
@@ -178,41 +180,10 @@ fun RelatedMoviesSection() {
             .padding(16.dp)
     ) {
         Text("Related Movies", style = MaterialTheme.typography.headlineSmall, color = Color.White)
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(12.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(10) { index ->
-
-                ClassicCard(
-                    onClick = { },
-                    modifier = Modifier.width(180.dp),
-                    image = {
-                        Image(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(CardDefaults.HorizontalImageAspectRatio),
-                            painter = painterResource(id = R.drawable.ic_logo),
-                            contentDescription = null,
-                        )
-                    },
-                    title = {
-                        Text(
-                            text = "Title goes here",
-                            modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)
-                        )
-                    },
-                    subtitle = {
-                        Text(
-                            text = "Secondary · text",
-                            modifier = Modifier.padding(
-                                top = 4.dp,
-                                start = 8.dp,
-                                end = 8.dp,
-                                bottom = 8.dp
-                            )
-                        )
-                    },
-                )
-
+            items(10) {index->
+                StandardCardContainerUI()
             }
         }
     }
@@ -226,25 +197,29 @@ fun CastSection() {
             .padding(16.dp)
     ) {
         Text("Cast", style = MaterialTheme.typography.headlineSmall, color = Color.White)
-        Spacer(Modifier.height(8.dp))
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        Spacer(Modifier.height(12.dp))
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp
+            ) // Add padding to avoid overflow
+        ) {
             items(10) { index ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
                     ScaleAbleAvatar(
                         avatarRes = R.drawable.ic_logo,
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
                         onProfileSelection = { }
                     )
-                    /* Image(
-                         painter = painterResource(id = ),
-                         contentDescription = null,
-                         modifier = Modifier
-                             .size(100.dp)
-                             .clip(CircleShape),
-                         contentScale = ContentScale.Crop
-                     )*/
-                    Text("Actor $index", color = Color.White)
+                    Text(
+                        "Actor $index",
+                        color = Color.White,
+                        modifier = Modifier.padding(top = 8.dp) // Ensure space between the avatar and text
+                    )
                 }
             }
         }
@@ -261,8 +236,8 @@ fun ScaleAbleAvatar(
         onClick = {
             onProfileSelection()
         },
-        modifier = modifier.size(110.dp) ,// enforce a square area.padding(horizontal = 1.dp),
-        border = ClickableSurfaceDefaults . border (
+        modifier = modifier.size(110.dp), // Enforce a square area
+        border = ClickableSurfaceDefaults.border(
             border = Border(
                 border = BorderStroke(
                     1.dp,
@@ -271,19 +246,18 @@ fun ScaleAbleAvatar(
                 shape = CircleShape,
             ),
             focusedBorder = Border(
-                border = BorderStroke(
-                    1.dp,
-                    Color.White,
-                ),
-                shape = CircleShape,
+                border = BorderStroke(width = 2.dp, color = Color.White),
+                inset = 0.dp,
             ),
-        ),
-        shape = ClickableSurfaceDefaults.shape(shape = CircleShape),
+
+            ),
+        shape = ClickableSurfaceDefaults.shape(shape = CircleShape), // Corrected shape
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.2f),
     ) {
         AvatarIcon(avatarRes = avatarRes, modifier = Modifier.fillMaxSize())
     }
 }
+
 
 @Composable
 fun AvatarIcon(modifier: Modifier, @DrawableRes avatarRes: Int, description: String? = null) {

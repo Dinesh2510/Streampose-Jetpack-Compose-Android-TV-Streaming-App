@@ -33,6 +33,12 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import androidx.tv.material3.*
 import com.pixeldev.composetv.graph.Screen
+import com.pixeldev.composetv.screens.common.ClassicCardUI
+import com.pixeldev.composetv.screens.common.CompactCardUi
+import com.pixeldev.composetv.screens.common.StandardCardContainerUI
+import com.pixeldev.composetv.screens.common.WideCardContainerUI
+import com.pixeldev.composetv.screens.common.WideClassicCardUI
+import com.pixeldev.composetv.screens.details.Top10MoviesListPreview
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHostController) {
@@ -63,14 +69,14 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHos
                     .height(324.dp)
             )
         }
-        item {/*
-            WideClassicCardUI()
+        item {
+            /*WideClassicCardUI()
             WideCardContainerUI()
             ClassicCardUI()
             StandardCardContainerUI()
             CompactCardUi()*/
           //  SampleImmersiveList()
-
+            Top10MoviesListPreview()
         }
 
         val categories = (1..10).map { "Category $it" }

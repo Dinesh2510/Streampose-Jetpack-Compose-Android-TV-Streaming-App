@@ -1,0 +1,82 @@
+[
+  {
+    "id": "1",
+    "videoUri": "https://example.com/video1.mp4",
+    "subtitleUri": "https://example.com/subtitles1.vtt",
+    "posterUri": "https://picsum.photos/id/1011/400/600",
+    "name": "The First Voyage",
+    "description": "A thrilling journey across uncharted waters."
+  },
+  {
+    "id": "2",
+    "videoUri": "https://example.com/video2.mp4",
+    "subtitleUri": "https://example.com/subtitles2.vtt",
+    "posterUri": "https://picsum.photos/id/1012/400/600",
+    "name": "Echoes in the Fog",
+    "description": "A mystery unfolds in a small coastal town."
+  },
+  {
+    "id": "3",
+    "videoUri": "https://example.com/video3.mp4",
+    "subtitleUri": "https://example.com/subtitles3.vtt",
+    "posterUri": "https://picsum.photos/id/1013/400/600",
+    "name": "Neon Skies",
+    "description": "A cyberpunk adventure in a neon-lit future."
+  },
+  {
+    "id": "4",
+    "videoUri": "https://example.com/video4.mp4",
+    "subtitleUri": "https://example.com/subtitles4.vtt",
+    "posterUri": "https://picsum.photos/id/1014/400/600",
+    "name": "Last Horizon",
+    "description": "Survivors fight for hope in a dying world."
+  },
+  {
+    "id": "5",
+    "videoUri": "https://example.com/video5.mp4",
+    "subtitleUri": "https://example.com/subtitles5.vtt",
+    "posterUri": "https://picsum.photos/id/1015/400/600",
+    "name": "Midnight Pulse",
+    "description": "A detective races against time in a city of crime."
+  },
+  {
+    "id": "6",
+    "videoUri": "https://example.com/video6.mp4",
+    "subtitleUri": "https://example.com/subtitles6.vtt",
+    "posterUri": "https://picsum.photos/id/1016/400/600",
+    "name": "Whispers of the Wind",
+    "description": "A tale of love and loss told through seasons."
+  },
+  {
+    "id": "7",
+    "videoUri": "https://example.com/video7.mp4",
+    "subtitleUri": "https://example.com/subtitles7.vtt",
+    "posterUri": "https://picsum.photos/id/1017/400/600",
+    "name": "Shadow Protocol",
+    "description": "An agent uncovers a conspiracy within his agency."
+  },
+  {
+    "id": "8",
+    "videoUri": "https://example.com/video8.mp4",
+    "subtitleUri": "https://example.com/subtitles8.vtt",
+    "posterUri": "https://picsum.photos/id/1018/400/600",
+    "name": "Crimson Dusk",
+    "description": "Vampires roam freely after the fall of society."
+  },
+  {
+    "id": "9",
+    "videoUri": "https://example.com/video9.mp4",
+    "subtitleUri": "https://example.com/subtitles9.vtt",
+    "posterUri": "https://picsum.photos/id/1019/400/600",
+    "name": "Iron Heart",
+    "description": "A rogue robot seeks meaning in a human world."
+  },
+  {
+    "id": "10",
+    "videoUri": "https://example.com/video10.mp4",
+    "subtitleUri": "https://example.com/subtitles10.vtt",
+    "posterUri": "https://picsum.photos/id/1020/400/600",
+    "name": "Ocean’s Breath",
+    "description": "Explorers dive into ancient underwater ruins."
+  }
+]
