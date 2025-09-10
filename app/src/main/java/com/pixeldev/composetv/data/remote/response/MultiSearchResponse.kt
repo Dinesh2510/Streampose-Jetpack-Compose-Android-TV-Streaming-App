@@ -2,14 +2,17 @@ package com.pixeldev.composetv.data.remote.response
 
 import com.pixeldev.composetv.models.Search
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class MultiSearchResponse(
-    @SerializedName("page")
+    @SerialName("page")
     val page: Int,
-    @SerializedName("results")
+    @SerialName("results")
     val results: List<Search>,
-    @SerializedName("total_pages")
+    @SerialName("total_pages")
     val totalPages: Int,
-    @SerializedName("total_results")
+    @SerialName("total_results")
     val totalResults: Int
 )

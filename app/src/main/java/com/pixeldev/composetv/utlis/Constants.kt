@@ -8,10 +8,12 @@ import com.pixeldev.composetv.BuildConfig
 class Constants {
 
     companion object {
-
-        const val BASE_URL = "api.themoviedb.org/"
+//https://www.themoviedb.org/talk/5aeaaf56c3a3682ddf0010de
+        const val BASE_URL = "api.themoviedb.org/3"
         const val API_KEY =  BuildConfig.API_KEY
-        const val BASE_BACKDROP_IMAGE_URL = "https://image.tmdb.org/t/p/w780/"
+        const val BASE_BACKDROP_IMAGE_URL_300 = "https://image.tmdb.org/t/p/w300/"
+        const val BASE_BACKDROP_IMAGE_URL_780 = "https://image.tmdb.org/t/p/w780/"
+        const val BASE_BACKDROP_IMAGE_URL_1280 = "https://image.tmdb.org/t/p/w1280/"
         const val BASE_POSTER_IMAGE_URL = "https://image.tmdb.org/t/p/w500/"
 
         const val nowPlayingAllListScreen = "nowPlayingAllListScreen"

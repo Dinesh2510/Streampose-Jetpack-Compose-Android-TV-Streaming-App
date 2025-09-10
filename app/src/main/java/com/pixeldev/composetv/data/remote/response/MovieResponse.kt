@@ -6,14 +6,13 @@ import kotlinx.serialization.Serializable
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
+
 @Serializable
 data class MovieResponse(
-    @SerialName("page")
-    val page: Int,
-    @SerialName("results")
-     val results: List<Movies>,
-    @SerialName("total_pages")
-    val totalPages: Int,
-    @SerialName("total_results")
-    val totalResults: Int
+
+    @SerialName("page") var page: Int? = null,
+    @SerialName("results") var results: ArrayList<Movies> = arrayListOf(),
+    @SerialName("total_pages") var totalPages: Int? = null,
+    @SerialName("total_results") var totalResults: Int? = null
+
 )

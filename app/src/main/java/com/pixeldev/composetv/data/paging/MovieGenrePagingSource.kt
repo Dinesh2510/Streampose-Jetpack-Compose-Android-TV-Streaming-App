@@ -19,7 +19,7 @@ class MovieGenrePagingSource(private val apiService: ApiService, private val tag
             LoadResult.Page(
                 data = response.results,
                 prevKey = if (nextPage == 1) null else nextPage - 1,
-                nextKey = if (response.page >= response.totalPages) null else response.page + 1
+                nextKey = response.totalPages?.let { response.page?.let { it1 -> if (it1 >= it) null else response.page!! + 1 } }
             )
         } catch (e: Exception) {
             LoadResult.Error(e)

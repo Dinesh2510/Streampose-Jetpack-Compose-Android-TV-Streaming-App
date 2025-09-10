@@ -2,61 +2,63 @@ package com.pixeldev.composetv.data.remote.response
 
 import com.pixeldev.composetv.models.Genre
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
 
-
+@Serializable
 data class MovieDetailsDTO(
-    @SerializedName("adult") val adult: Boolean,
-    @SerializedName("backdrop_path") val backdropPath: String?,
-    @SerializedName("belongs_to_collection") val belongsToCollection: BelongsToCollection?,
-    @SerializedName("budget") val budget: Long,
-    @SerializedName("genres") val genres: List<Genre>,
-    @SerializedName("homepage") val homepage: String,
-    @SerializedName("id") val id: Int,
-    @SerializedName("imdb_id") val imdbId: String,
-    @SerializedName("original_language") val originalLanguage: String,
-    @SerializedName("original_title") val originalTitle: String,
-    @SerializedName("overview") val overview: String?,
-    @SerializedName("popularity") val popularity: Double,
-    @SerializedName("poster_path") val posterPath: String?,
-    @SerializedName("production_companies") val productionCompanies: List<ProductionCompany>,
-    @SerializedName("production_countries") val productionCountries: List<ProductionCountry>,
-    @SerializedName("release_date") val releaseDate: String,
-    @SerializedName("revenue") val revenue: Long,
-    @SerializedName("runtime") val runtime: Int?,
-    @SerializedName("spoken_languages") val spokenLanguages: List<SpokenLanguage>,
-    @SerializedName("status") val status: String,
-    @SerializedName("tagline") val tagline: String?,
-    @SerializedName("title") val title: String,
-    @SerializedName("video") val video: Boolean,
-    @SerializedName("vote_average") val voteAverage: Double,
-    @SerializedName("vote_count") val voteCount: Long,
+    @SerialName("adult") val adult: Boolean,
+    @SerialName("backdrop_path") val backdropPath: String?,
+    @SerialName("belongs_to_collection") val belongsToCollection: BelongsToCollection?,
+    @SerialName("budget") val budget: Long,
+    @SerialName("genres") val genres: List<Genre>,
+    @SerialName("homepage") val homepage: String,
+    @SerialName("id") val id: Int,
+    @SerialName("imdb_id") val imdbId: String,
+    @SerialName("original_language") val originalLanguage: String,
+    @SerialName("original_title") val originalTitle: String,
+    @SerialName("overview") val overview: String?,
+    @SerialName("popularity") val popularity: Double,
+    @SerialName("poster_path") val posterPath: String?,
+    @SerialName("production_companies") val productionCompanies: List<ProductionCompany>,
+    @SerialName("production_countries") val productionCountries: List<ProductionCountry>,
+    @SerialName("release_date") val releaseDate: String,
+    @SerialName("revenue") val revenue: Long,
+    @SerialName("runtime") val runtime: Int?,
+    @SerialName("spoken_languages") val spokenLanguages: List<SpokenLanguage>,
+    @SerialName("status") val status: String,
+    @SerialName("tagline") val tagline: String?,
+    @SerialName("title") val title: String,
+    @SerialName("video") val video: Boolean,
+    @SerialName("vote_average") val voteAverage: Double,
+    @SerialName("vote_count") val voteCount: Long,
 ) {
 
-    
+    @Serializable
     data class BelongsToCollection(
-        @SerializedName("backdrop_path") val backdropPath: String,
-        @SerializedName("id") val id: Int,
-        @SerializedName("name") val name: String,
-        @SerializedName("poster_path") val posterPath: String
+        @SerialName("backdrop_path") val backdropPath: String,
+        @SerialName("id") val id: Int,
+        @SerialName("name") val name: String,
+        @SerialName("poster_path") val posterPath: String
     )
 
-    
+    @Serializable
     data class ProductionCompany(
-        @SerializedName("id") val id: Int,
-        @SerializedName("logo_path") val logoPath: String?,
-        @SerializedName("name") val name: String,
-        @SerializedName("origin_country") val originCountry: String
+        @SerialName("id") val id: Int,
+        @SerialName("logo_path") val logoPath: String?,
+        @SerialName("name") val name: String,
+        @SerialName("origin_country") val originCountry: String
     )
 
-    
+    @Serializable
     data class ProductionCountry(
-        @SerializedName("iso_3166_1") val iso31661: String,
-        @SerializedName("name") val name: String
+        @SerialName("iso_3166_1") val iso31661: String,
+        @SerialName("name") val name: String
     )
 
-    
+    @Serializable
     data class SpokenLanguage(
-        @SerializedName("iso_639_1") val iso6391: String,
-        @SerializedName("name") val name: String
+        @SerialName("iso_639_1") val iso6391: String,
+        @SerialName("name") val name: String
     )
 }

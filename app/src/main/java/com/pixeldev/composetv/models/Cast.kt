@@ -3,13 +3,16 @@ package com.pixeldev.composetv.models
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Parcelize
 data class Cast(
-    @SerializedName("known_for_department")
+    @SerialName("known_for_department")
     val department: String,
-    @SerializedName("name")
+    @SerialName("name")
     val name: String,
-    @SerializedName("profile_path")
+    @SerialName("profile_path")
     val profilePath: String?
 ): Parcelable

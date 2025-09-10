@@ -2,8 +2,6 @@ package com.pixeldev.composetv.screens.details
 
 import android.content.Context
 import androidx.compose.animation.AnimatedContent
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 
 import androidx.compose.animation.AnimatedVisibility
@@ -58,7 +56,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,30 +70,33 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.jetstream.presentation.utils.rememberChildPadding
 import com.pixeldev.composetv.R
+import com.pixeldev.composetv.data.remote.response.MovieResponse
+import com.pixeldev.composetv.models.Movies
+import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_300
+import com.pixeldev.composetv.utlis.Constants.Companion.BASE_POSTER_IMAGE_URL
 import com.pixeldev.composetv.utlis.bringIntoViewIfChildrenAreFocused
 
-@Preview
 @Composable
-fun Top10MoviesListPreview() {
+fun Top10MoviesListPreview(trendingMovie: MovieResponse?) {
     val context = LocalContext.current
-    val movies = context.getDummyMovies()
+    var movieResponse = trendingMovie!!.results
 
     Top10MoviesList(
-        movieList = movies,
-        onMovieClick = { println("Clicked: ${it.name}") }
+        movieList = movieResponse,
+        onMovieClick = { }
     )
 }
 
 @Composable
 fun Top10MoviesList(
-    movieList: List<MovieResponse>,
+    movieList: List<Movies>,
     modifier: Modifier = Modifier,
     gradientColor: Color = MaterialTheme.colorScheme.background.copy(alpha = 1f),
-    onMovieClick: (movie: MovieResponse) -> Unit
+    onMovieClick: (Movies) -> Unit
 ) {
 
     var isListFocused by remember { mutableStateOf(false) }
-    var selectedMovie by remember(movieList) { mutableStateOf(movieList.first()) }
+    var selectedMovie: Movies by remember(movieList) { mutableStateOf(movieList.first()) }
 
     val sectionTitle = if (isListFocused) {
         null
@@ -125,14 +125,14 @@ fun Top10MoviesList(
 
 @Composable
 private fun ImmersiveList(
-    selectedMovie: MovieResponse,
+    selectedMovie: Movies,
     isListFocused: Boolean,
     gradientColor: Color,
-    movieList: List<MovieResponse>,
+    movieList: List<Movies>,
     sectionTitle: String?,
     onFocusChanged: (FocusState) -> Unit,
-    onMovieFocused: (MovieResponse) -> Unit,
-    onMovieClick: (MovieResponse) -> Unit,
+    onMovieFocused: (Movies) -> Unit,
+    onMovieClick: (Movies) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -178,7 +178,7 @@ enum class ItemDirection(val aspectRatio: Float) {
 
 @Composable
 private fun Background(
-    movie: MovieResponse,
+    movie: Movies,
     visible: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -200,14 +200,14 @@ private fun Background(
 
 @Composable
 fun PosterImage(
-    movie: MovieResponse,
+    movie: Movies,
     modifier: Modifier = Modifier,
 ) {
     AsyncImage(
         modifier = modifier,
         model = ImageRequest.Builder(LocalContext.current)
             .crossfade(true)
-            .data(movie.posterUri)
+            .data(BASE_BACKDROP_IMAGE_URL_300+movie.backdropPath)
             .build(),
         contentDescription = "",
         contentScale = ContentScale.Crop
@@ -216,7 +216,7 @@ fun PosterImage(
 
 @Composable
 private fun MovieDescription(
-    movie: MovieResponse,
+    movie: Movies,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -224,15 +224,17 @@ private fun MovieDescription(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = movie.name.toString(),
+            text = movie.title .toString(),
             style = MaterialTheme.typography.displaySmall,
             color = Color.White
         )
         Text(
             modifier = Modifier.fillMaxWidth(0.5f),
-            text = movie.description.toString(),
+            text = movie.overview .toString(),
             style = MaterialTheme.typography.bodyLarge,
             color = Color.White,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
             fontWeight = FontWeight.Light,
         )
     }
@@ -288,12 +290,13 @@ fun Context.loadJSONFromAsset(fileName: String): String {
     return assets.open(fileName).bufferedReader().use { it.readText() }
 }
 
-fun Context.getDummyMovies(): List<MovieResponse> {
+/*fun Context.getDummyMovies(): List<MovieResponse> {
     val json = loadJSONFromAsset("movies.json")
     val type = object : TypeToken<List<MovieResponse>>() {}.type
     return Gson().fromJson(json, type)
-}
+}*/
 
+/*
 data class MovieResponse(
     val id: String?,
     val videoUri: String?,
@@ -302,11 +305,12 @@ data class MovieResponse(
     val name: String?,
     val description: String?
 )
+*/
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ImmersiveListMoviesRow(
-    movieList: List<MovieResponse>,
+    movieList: List<Movies>,
     modifier: Modifier = Modifier,
     itemDirection: ItemDirection = ItemDirection.Vertical,
     startPadding: Dp = rememberChildPadding().start,
@@ -318,8 +322,8 @@ fun ImmersiveListMoviesRow(
     ),
     showItemTitle: Boolean = true,
     showIndexOverImage: Boolean = false,
-    onMovieSelected: (MovieResponse) -> Unit = {},
-    onMovieFocused: (MovieResponse) -> Unit = {}
+    onMovieSelected: (Movies) -> Unit = {},
+    onMovieFocused: (Movies) -> Unit = {}
 ) {
     val (lazyRow, firstItem) = remember { FocusRequester.createRefs() }
 
@@ -329,6 +333,8 @@ fun ImmersiveListMoviesRow(
         if (title != null) {
             Text(
                 text = title,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
                 style = titleStyle,
                 color = Color.White,
                 modifier = Modifier
@@ -386,13 +392,13 @@ fun ImmersiveListMoviesRow(
 @Composable
 private fun MoviesRowItem(
     index: Int,
-    movie: MovieResponse,
-    onMovieSelected: (MovieResponse) -> Unit,
+    movie: Movies,
+    onMovieSelected: (Movies) -> Unit,
     showItemTitle: Boolean,
     showIndexOverImage: Boolean,
     modifier: Modifier = Modifier,
     itemDirection: ItemDirection = ItemDirection.Vertical,
-    onMovieFocused: (MovieResponse) -> Unit = {},
+    onMovieFocused: (Movies) -> Unit = {},
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
@@ -432,7 +438,7 @@ private fun MoviesRowItem(
 
 @Composable
 private fun MoviesRowItemImage(
-    movie: MovieResponse,
+    movie: Movies,
     showIndexOverImage: Boolean,
     index: Int,
     modifier: Modifier = Modifier,
@@ -475,7 +481,7 @@ private fun MoviesRowItemImage(
 private fun MoviesRowItemText(
     showItemTitle: Boolean,
     isItemFocused: Boolean,
-    movie: MovieResponse,
+    movie: Movies,
     modifier: Modifier = Modifier
 ) {
     if (showItemTitle) {
@@ -484,7 +490,7 @@ private fun MoviesRowItemText(
             label = "",
         )
         Text(
-            text = movie.name!!,
+            text = movie.title!!,
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontWeight = FontWeight.SemiBold
             ),

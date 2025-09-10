@@ -45,7 +45,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.pixeldev.composetv.screens.details.MovieResponse
+import com.pixeldev.composetv.data.remote.response.MovieResponse
 import com.pixeldev.composetv.utlis.Padding
 
 /**

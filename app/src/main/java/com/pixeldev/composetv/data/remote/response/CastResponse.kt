@@ -2,10 +2,13 @@ package com.pixeldev.composetv.data.remote.response
 
 import com.pixeldev.composetv.models.Cast
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class CastResponse(
-    @SerializedName("id")
+    @SerialName("id")
     val id: Int,
-    @SerializedName("cast")
+    @SerialName("cast")
     val castResult: List<Cast>
 )

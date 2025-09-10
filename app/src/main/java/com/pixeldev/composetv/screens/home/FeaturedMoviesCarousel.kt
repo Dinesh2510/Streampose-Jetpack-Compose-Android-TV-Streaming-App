@@ -52,9 +52,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
@@ -67,7 +67,9 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.ShapeDefaults
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
-import com.pixeldev.composetv.R
+import com.pixeldev.composetv.data.remote.response.MovieResponse
+import com.pixeldev.composetv.models.Movies
+import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_780
 
 
 @OptIn(ExperimentalTvMaterial3Api::class)
@@ -79,8 +81,11 @@ val CarouselSaver = Saver<CarouselState, Int>(
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun FeaturedMoviesCarousel(
+    discoveryMovie: MovieResponse?,
     modifier: Modifier = Modifier
 ) {
+    var movieResponse = discoveryMovie!!.results
+    var sliderCount = movieResponse.take(5).size
     val carouselState = rememberSaveable(saver = CarouselSaver) { CarouselState(0) }
     var isCarouselFocused by remember { mutableStateOf(false) }
     val alpha = if (isCarouselFocused) {
@@ -104,14 +109,13 @@ fun FeaturedMoviesCarousel(
             }
             .semantics {
                 contentDescription =
-                   ""
-            }
-           ,
-        itemCount = 4,
+                    ""
+            },
+        itemCount = sliderCount,
         carouselState = carouselState,
         carouselIndicator = {
             CarouselIndicator(
-                itemCount = 4,
+                itemCount = sliderCount,
                 activeItemIndex = carouselState.activeItemIndex
             )
         },
@@ -120,11 +124,12 @@ fun FeaturedMoviesCarousel(
         contentTransformEndToStart = fadeIn(tween(durationMillis = 1000))
             .togetherWith(fadeOut(tween(durationMillis = 1000))),
         content = { index ->
-           // val movie = movies[index]
+             val movie = movieResponse[index]
             // background
-            CarouselItemBackground(modifier = Modifier.fillMaxSize())
+            CarouselItemBackground(modifier = Modifier.fillMaxSize(), movie)
             // foreground
             CarouselItemForeground(
+                movie,
                 isCarouselFocused = isCarouselFocused,
                 modifier = Modifier.fillMaxSize()
             )
@@ -161,6 +166,7 @@ private fun BoxScope.CarouselIndicator(
 
 @Composable
 private fun CarouselItemForeground(
+    movie: Movies,
     modifier: Modifier = Modifier,
     isCarouselFocused: Boolean = false
 ) {
@@ -175,7 +181,7 @@ private fun CarouselItemForeground(
             verticalArrangement = Arrangement.Bottom
         ) {
             Text(
-                text = "movie.name",
+                text = movie.title!!,
                 style = MaterialTheme.typography.displayMedium.copy(
                     /*shadow = Shadow(
                         color = Color.White.copy(alpha = 0.5f),
@@ -187,7 +193,7 @@ private fun CarouselItemForeground(
                 maxLines = 1
             )
             Text(
-                text = "movie.description",
+                text = movie.overview.toString(),
                 style = MaterialTheme.typography.titleMedium.copy(
                     color = MaterialTheme.colorScheme.onSurface.copy(
                         alpha = 0.65f
@@ -198,7 +204,8 @@ private fun CarouselItemForeground(
                         blurRadius = 2f
                     )
                 ),
-                maxLines = 1,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 8.dp)
             )
             AnimatedVisibility(
@@ -212,9 +219,9 @@ private fun CarouselItemForeground(
 }
 
 @Composable
-private fun CarouselItemBackground( modifier: Modifier = Modifier) {
+private fun CarouselItemBackground(modifier: Modifier = Modifier, movie: Movies) {
     AsyncImage(
-        model = "https://picsum.photos/300/200",
+        model = BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath,
         contentDescription = "",
         modifier = modifier
             .drawWithContent {
@@ -252,7 +259,7 @@ private fun WatchNowButton() {
         )
         Spacer(Modifier.size(8.dp))
         Text(
-            text = stringResource(R.string.app_name),
+            text = "Play",
             style = MaterialTheme.typography.titleSmall
         )
     }
