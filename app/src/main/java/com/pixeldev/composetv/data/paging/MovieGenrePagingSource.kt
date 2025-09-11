@@ -1,4 +1,4 @@
-package com.app.movieapp.data.paging
+package com.pixeldev.composetv.data.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState

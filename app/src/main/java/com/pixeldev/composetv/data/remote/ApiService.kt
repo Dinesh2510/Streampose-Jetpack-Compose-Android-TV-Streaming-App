@@ -27,7 +27,7 @@ suspend fun getTrendingMovies(
     language: String = "en"
 ): MovieResponse {
     return client.get {
-        url("trending/movie/week")
+        url("trending/movie/day")
         parameter("page", page)
         parameter("api_key", apiKey)
         parameter("language", language)

@@ -53,7 +53,7 @@ fun HomeTopBar(
     Box(
         modifier = Modifier
             .fillMaxWidth().padding(top=16.dp)
-            .background(MaterialTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Row(

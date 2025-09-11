@@ -91,7 +91,7 @@ fun Top10MoviesListPreview(trendingMovie: MovieResponse?) {
 fun Top10MoviesList(
     movieList: List<Movies>,
     modifier: Modifier = Modifier,
-    gradientColor: Color = MaterialTheme.colorScheme.background.copy(alpha = 1f),
+    gradientColor: Color = Color(0xFF1C1C1E),
     onMovieClick: (Movies) -> Unit
 ) {
 

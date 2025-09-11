@@ -259,7 +259,7 @@ private fun WatchNowButton() {
         )
         Spacer(Modifier.size(8.dp))
         Text(
-            text = "Play",
+            text = "Watch Now",
             style = MaterialTheme.typography.titleSmall
         )
     }

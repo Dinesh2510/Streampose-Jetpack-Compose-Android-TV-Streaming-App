@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Slideshow
@@ -23,7 +22,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -36,6 +34,7 @@ import androidx.tv.material3.NavigationDrawer
 import androidx.tv.material3.NavigationDrawerItem
 import androidx.tv.material3.Text
 import androidx.tv.material3.rememberDrawerState
+import com.pixeldev.composetv.screens.categories.CategoryDetails
 import com.pixeldev.composetv.screens.categories.CategoryScreen
 import com.pixeldev.composetv.screens.details.MovieDetailsScreen
 import com.pixeldev.composetv.screens.home.HomeScreen
@@ -67,6 +66,9 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                     // TODO: handle play action, maybe navigate to player
                 }
             )
+        }
+        composable(Screen.CategoryDetailsScreen.route) {
+            CategoryDetails(navController)
         }
     }
 }
@@ -156,8 +158,10 @@ fun DashBoardScreen(navController: NavHostController) {
                 MoviesContentScreen()
             }
             composable(Screen.CategoriesScreen.route) {
-                CategoryScreen()
+                CategoryScreen(navController)
             }
+
+
         }
     }
 }

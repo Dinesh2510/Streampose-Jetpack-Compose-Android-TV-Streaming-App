@@ -83,6 +83,11 @@ import androidx.tv.material3.rememberDrawerState
 import androidx.tv.material3.*
 import coil.compose.rememberAsyncImagePainter
 import com.pixeldev.composetv.R
+import com.pixeldev.composetv.screens.common.ClassicCardUI
+import com.pixeldev.composetv.screens.common.CompactCardUi
+import com.pixeldev.composetv.screens.common.StandardCardContainerUI
+import com.pixeldev.composetv.screens.common.WideCardContainerUI
+import com.pixeldev.composetv.screens.common.WideClassicCardUI
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -422,6 +427,11 @@ fun TvScreenContent(title: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            WideClassicCardUI()
+            WideCardContainerUI()
+            ClassicCardUI()
+            StandardCardContainerUI()
+            CompactCardUi()
             Text(
                 text = title,
                 style = MaterialTheme.typography.headlineMedium,

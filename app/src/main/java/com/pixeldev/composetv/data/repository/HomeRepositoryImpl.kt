@@ -2,7 +2,7 @@ package com.pixeldev.composetv.data.repository
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import com.app.movieapp.data.paging.MovieGenrePagingSource
+import com.pixeldev.composetv.data.paging.MovieGenrePagingSource
 import com.pixeldev.composetv.data.paging.MoviePagingSource
 import com.pixeldev.composetv.data.remote.ApiService
 import javax.inject.Inject
