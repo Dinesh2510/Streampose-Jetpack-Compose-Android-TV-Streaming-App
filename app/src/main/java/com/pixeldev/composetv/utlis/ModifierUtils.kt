@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -41,6 +42,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.google.gson.Gson
@@ -259,4 +261,18 @@ fun Context.getDummyMovies(): List<MovieResponse> {
     val json = loadJSONFromAsset("movies.json")
     val type = object : TypeToken<List<MovieResponse>>() {}.type
     return Gson().fromJson(json, type)
+}
+
+@Composable
+fun SectionHeader(title: String) {
+    Text(
+        text = title,
+        style =
+            MaterialTheme.typography.headlineLarge.copy(
+                fontWeight = FontWeight.Medium,
+                fontSize = 25.sp
+            ),
+        color = Color.White,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+    )
 }

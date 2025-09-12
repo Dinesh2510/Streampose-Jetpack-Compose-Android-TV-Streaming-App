@@ -1,6 +1,7 @@
 package com.pixeldev.composetv.screens.home
 
 
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -8,11 +9,11 @@ import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,6 +39,8 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import androidx.tv.material3.*
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import com.google.jetstream.presentation.utils.SectionHeader
 import com.pixeldev.composetv.R
 import com.pixeldev.composetv.data.remote.response.GenreResponse
 import com.pixeldev.composetv.data.remote.response.MovieResponse
@@ -111,15 +114,15 @@ fun ShowHomeScreenData(viewModel: HomeViewModel = viewModel(), navController: Na
             }
 
             hasError -> {
-               /* ErrorContent(
-                    listOf(
-                        discoveryMovieState,
-                        trendingMovieState,
-                        nowPlayingMovieState,
-                        upcomingMovieState,
-                        genresMovieState
-                    )
-                )*/
+                /* ErrorContent(
+                     listOf(
+                         discoveryMovieState,
+                         trendingMovieState,
+                         nowPlayingMovieState,
+                         upcomingMovieState,
+                         genresMovieState
+                     )
+                 )*/
                 ErrorScreen(
                     title = "🛠️ Oops! The Hamsters Took a Coffee Break ☕",
                     subtitle = "Our servers are out chasing bugs... or maybe just napping.",
@@ -155,7 +158,7 @@ fun MovieContent(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
-        contentPadding = PaddingValues(vertical = 16.dp),
+        contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
         item() {
@@ -217,18 +220,15 @@ fun MovieContent(
 @Composable
 fun MovieSection(title: String, movies: ArrayList<Movies>?, onClickMovieCard: () -> Unit) {
     Column {
-        Text(
-            text = title,
-            style =
-                MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 30.sp
-                ),
-            color = Color.White,
-            modifier = Modifier.padding(16.dp)
-        )
+        SectionHeader(title)
 
-        LazyRow {
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 0.dp), // Or remove this line
+            contentPadding = PaddingValues(start = 24.dp, end = 24.dp), // Control padding here
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             items(movies ?: emptyList()) { movie ->
                 TvCardItem(
                     title = "${movie.title}",
@@ -239,22 +239,98 @@ fun MovieSection(title: String, movies: ArrayList<Movies>?, onClickMovieCard: ()
     }
 }
 
+
+
+@Composable
+fun TvCardItem(
+    title: String,
+    imageUrl: String,
+    onClickPressed: () -> Unit,
+) {
+    CompactCard(
+        onClick = { onClickPressed() },
+        modifier = Modifier
+            .width(200.dp),
+        image = {
+            Image(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(CardDefaults.HorizontalImageAspectRatio),
+                painter = rememberAsyncImagePainter(imageUrl),
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds
+            )
+        },
+        title = {
+            Text(
+                text = title,
+                modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)
+            )
+        },
+        subtitle = {
+            Text(
+                text = "Secondary · text",
+                modifier = Modifier.padding(
+                    top = 4.dp,
+                    start = 8.dp,
+                    end = 8.dp,
+                    bottom = 8.dp
+                )
+            )
+        },
+    )
+    /*  Card(
+          onClick = {},
+          modifier = Modifier.width(200.dp).aspectRatio(CardDefaults.HorizontalImageAspectRatio),
+          border =
+              CardDefaults.border(
+                  focusedBorder =
+                      Border(
+                          border = BorderStroke(width = 3.dp, color = Color.White),
+                          shape = RoundedCornerShape(5),
+                      ),
+              ),
+          colors =
+              CardDefaults.colors(containerColor = Color.Gray, focusedContainerColor = Color.Gray),
+          scale =
+              CardDefaults.scale(
+                  focusedScale = 1.05f,
+              )
+      ) {  Column {
+          Image(
+              painter = rememberAsyncImagePainter(imageUrl),
+              contentDescription = title,
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .height(120.dp),
+              contentScale = ContentScale.Crop
+          )
+          Text(
+              text = title,
+              color = Color.White,
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth(),
+              maxLines = 1
+          )
+      }}*/
+
+}
+
 @Composable
 fun GenreSection(genres: List<Genre>?) {
     Column {
-        Text(
-            text = "Genres",
-            style =
-                MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 30.sp
-                ),
-            modifier = Modifier.padding(16.dp)
-        )
+        SectionHeader("Genres")
 
-        LazyRow {
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 8.dp), // 👈 Gives breathing room at edges
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ){
             items(genres ?: emptyList()) { genre ->
-                CategoryItem(genre = genre,
+                CategoryItem(
+                    genre = genre,
                     modifier = Modifier,
                     onClick = { }
                 )
@@ -263,23 +339,7 @@ fun GenreSection(genres: List<Genre>?) {
     }
 }
 
-@Composable
-fun GenreCard(genre: Genre) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .width(100.dp),
-        onClick = {}
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = genre.name,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(8.dp)
-            )
-        }
-    }
-}
+
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -333,7 +393,23 @@ private fun CategoryItem(
     }
 }
 
-
+@Composable
+fun GenreCard(genre: Genre) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .width(100.dp),
+        onClick = {}
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = genre.name,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+    }
+}
 @Composable
 fun ErrorContent(states: List<MovieState<*>>) {
     Column(modifier = Modifier.padding(32.dp)) {
