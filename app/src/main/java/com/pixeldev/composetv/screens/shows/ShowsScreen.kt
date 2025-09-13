@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -195,7 +196,17 @@ fun HeroCarousel(heroList: List<Movie>) {
             )
             // Overlay text etc
             Column(
-                modifier = Modifier
+                modifier = Modifier.fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,  // start of the gradient
+                                Color(0xFF261F1F)  // Dark Navy or your chosen color at the bottom
+                            ),
+                            startY = 0f,
+                            endY = 200f  // Adjust height of the gradient
+                        )
+                    )
                     .align(Alignment.BottomStart)
                     .padding(16.dp)
             ) {

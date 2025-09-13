@@ -63,7 +63,6 @@ fun ShowHomeScreenData(viewModel: HomeViewModel = viewModel(), navController: Na
     val upcomingMovieState by viewModel.upcomingMoviesResponses.collectAsState()
     val genresMovieState by viewModel.genresMoviesResponses.collectAsState()
     val moviesLazyPagingItems = viewModel.popularAllListState.collectAsLazyPagingItems()
-    val categories = (1..10).map { "Category $it" }
 
     /*  Log.d("TAG_ShowHome", "ShowHomeScreenData: "+discoveryMovieState)
       when (val state = discoveryMovieState) {

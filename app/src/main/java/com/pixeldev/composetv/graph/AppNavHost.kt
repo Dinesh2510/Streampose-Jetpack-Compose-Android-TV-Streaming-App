@@ -156,7 +156,7 @@ fun DashBoardScreen(navController: NavHostController) {
                 AllShowsScreen(navController)
             }
             composable(Screen.MoviesScreen.route) {
-                MoviesContentScreen()
+                MoviesContentScreen(navController=navController)
             }
             composable(Screen.CategoriesScreen.route) {
                 CategoryScreen(navController)
