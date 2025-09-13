@@ -31,7 +31,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import androidx.tv.material3.surfaceColorAtElevation
 import com.pixeldev.composetv.R
-import com.pixeldev.composetv.screens.details.JetStreamCardShape
+import com.pixeldev.composetv.screens.home.JetStreamCardShape
 
 
 @Composable

@@ -48,6 +48,8 @@ import androidx.tv.material3.*
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.pixeldev.composetv.R
+import com.pixeldev.composetv.screens.shows.ShowsScreen
+
 @Composable
 fun MoviesContentScreen() {
     val dummyMovieCategories = listOf(
@@ -71,10 +73,12 @@ fun MoviesContentScreen() {
         )
     )
 
+
     val focusedMovie = remember { mutableStateOf(dummyMovieCategories.first().second.first()) }
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
+
         // 🎞 Immersive Top Box (Fixed)
         Box(
             modifier = Modifier

@@ -28,7 +28,7 @@ import androidx.tv.material3.Switch
 import androidx.tv.material3.SwitchDefaults
 import androidx.tv.material3.Text
 import androidx.tv.material3.surfaceColorAtElevation
-import com.pixeldev.composetv.screens.details.JetStreamCardShape
+import com.pixeldev.composetv.screens.home.JetStreamCardShape
 
 @Composable
 fun SubtitlesSection(

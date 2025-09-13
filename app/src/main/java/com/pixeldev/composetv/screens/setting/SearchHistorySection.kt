@@ -29,7 +29,7 @@ import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.pixeldev.composetv.screens.details.JetStreamCardShape
+import com.pixeldev.composetv.screens.home.JetStreamCardShape
 
 @Composable
 fun SearchHistorySection() {

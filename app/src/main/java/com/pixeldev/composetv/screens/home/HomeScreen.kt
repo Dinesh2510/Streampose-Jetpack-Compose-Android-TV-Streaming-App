@@ -30,17 +30,15 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import androidx.tv.material3.*
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
-import com.google.jetstream.presentation.utils.SectionHeader
+import com.pixeldev.composetv.utlis.SectionHeader
 import com.pixeldev.composetv.R
 import com.pixeldev.composetv.data.remote.response.GenreResponse
 import com.pixeldev.composetv.data.remote.response.MovieResponse
@@ -48,7 +46,6 @@ import com.pixeldev.composetv.graph.Screen
 import com.pixeldev.composetv.models.Genre
 import com.pixeldev.composetv.models.Movies
 import com.pixeldev.composetv.screens.categories.ErrorScreen
-import com.pixeldev.composetv.screens.details.Top10MoviesListPreview
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_300
 import com.pixeldev.composetv.utlis.MovieState
 import com.pixeldev.composetv.utlis.TVGradientLoadingIndicator
@@ -175,8 +172,9 @@ fun MovieContent(
             )
         }
         item {
-            Top10MoviesListPreview(trendingMovie)
+            Top10MoviesListPreview(trendingMovie = trendingMovie)
         }
+
         item {
             MovieSection(
                 title = "Discovery Movies",
@@ -231,8 +229,7 @@ fun MovieSection(title: String, movies: ArrayList<Movies>?, onClickMovieCard: ()
         ) {
             items(movies ?: emptyList()) { movie ->
                 TvCardItem(
-                    title = "${movie.title}",
-                    imageUrl = BASE_BACKDROP_IMAGE_URL_300 + movie.backdropPath
+                    movie
                 ) { onClickMovieCard() }
             }
         }
@@ -243,8 +240,7 @@ fun MovieSection(title: String, movies: ArrayList<Movies>?, onClickMovieCard: ()
 
 @Composable
 fun TvCardItem(
-    title: String,
-    imageUrl: String,
+    movie: Movies,
     onClickPressed: () -> Unit,
 ) {
     CompactCard(
@@ -256,20 +252,23 @@ fun TvCardItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(CardDefaults.HorizontalImageAspectRatio),
-                painter = rememberAsyncImagePainter(imageUrl),
+                painter = rememberAsyncImagePainter( BASE_BACKDROP_IMAGE_URL_300 + movie.backdropPath ),
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds
             )
         },
         title = {
             Text(
-                text = title,
+                text = movie.title?:"",
                 modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)
             )
         },
         subtitle = {
+            val rating = movie.voteAverage?.let { String.format("%.1f", it) } ?: "-"
+            val year = movie.releaseDate?.take(4) ?: "-"
+
             Text(
-                text = "Secondary · text",
+                text = "⭐ $rating · $year",
                 modifier = Modifier.padding(
                     top = 4.dp,
                     start = 8.dp,
@@ -277,6 +276,7 @@ fun TvCardItem(
                     bottom = 8.dp
                 )
             )
+
         },
     )
     /*  Card(
@@ -324,12 +324,14 @@ fun GenreSection(genres: List<Genre>?) {
         SectionHeader("Genres")
 
         LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = 8.dp), // 👈 Gives breathing room at edges
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 0.dp), // Or remove this line
+            contentPadding = PaddingValues(start = 24.dp, end = 24.dp), // Control padding here
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ){
             items(genres ?: emptyList()) { genre ->
-                CategoryItem(
+                GenreItem(
                     genre = genre,
                     modifier = Modifier,
                     onClick = { }
@@ -343,7 +345,7 @@ fun GenreSection(genres: List<Genre>?) {
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun CategoryItem(
+private fun GenreItem(
     modifier: Modifier = Modifier,
     genre: Genre,
     onClick: () -> Unit

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.jetstream.presentation.utils
+package com.pixeldev.composetv.utlis
 
 import android.content.Context
 import android.view.KeyEvent
@@ -48,7 +48,6 @@ import androidx.tv.material3.Text
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.pixeldev.composetv.data.remote.response.MovieResponse
-import com.pixeldev.composetv.utlis.Padding
 
 /**
  * Handles horizontal (Left & Right) D-Pad Keys and consumes the event(s) so that the focus doesn't

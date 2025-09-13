@@ -43,7 +43,7 @@ import androidx.tv.material3.ShapeDefaults
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import androidx.tv.material3.surfaceColorAtElevation
-import com.google.jetstream.presentation.utils.rememberChildPadding
+import com.pixeldev.composetv.utlis.rememberChildPadding
 import com.pixeldev.composetv.R
 
 

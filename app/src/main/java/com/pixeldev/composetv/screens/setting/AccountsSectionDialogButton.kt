@@ -32,7 +32,7 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.pixeldev.composetv.screens.details.JetStreamButtonShape
+import com.pixeldev.composetv.screens.home.JetStreamButtonShape
 
 @Composable
 fun AccountsSectionDialogButton(

@@ -42,7 +42,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,9 +53,8 @@ import androidx.tv.material3.ShapeDefaults
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.google.jetstream.presentation.utils.TitleValueText
-import com.google.jetstream.presentation.utils.rememberChildPadding
-import com.pixeldev.composetv.R
+import com.pixeldev.composetv.utlis.TitleValueText
+import com.pixeldev.composetv.utlis.rememberChildPadding
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)

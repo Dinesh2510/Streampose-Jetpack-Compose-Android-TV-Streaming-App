@@ -1,4 +1,4 @@
-package com.pixeldev.composetv.screens.details
+package com.pixeldev.composetv.screens.home
 
 import android.content.Context
 import androidx.compose.animation.AnimatedContent
@@ -68,12 +68,11 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.google.jetstream.presentation.utils.rememberChildPadding
+import com.pixeldev.composetv.utlis.rememberChildPadding
 import com.pixeldev.composetv.R
 import com.pixeldev.composetv.data.remote.response.MovieResponse
 import com.pixeldev.composetv.models.Movies
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_300
-import com.pixeldev.composetv.utlis.Constants.Companion.BASE_POSTER_IMAGE_URL
 import com.pixeldev.composetv.utlis.bringIntoViewIfChildrenAreFocused
 
 @Composable
