@@ -423,26 +423,48 @@ fun TvScreenContent(title: String) {
             .background(Color(0xFFCCCCCC)), // light gray
         contentAlignment = Alignment.Center
     ) {
-        Column(
+        LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            modifier = Modifier.fillMaxSize()
         ) {
-            WideClassicCardUI()
-            WideCardContainerUI()
-            ClassicCardUI()
-            StandardCardContainerUI()
-            CompactCardUi()
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.Black
-            )
-            Button(
-                onClick = { /* handle action */ }
-            ) {
-                Text("TV Button")
+            item {
+                WideClassicCardUI()
+            }
+
+            item {
+                WideCardContainerUI()
+            }
+
+            item {
+                ClassicCardUI()
+            }
+
+            item {
+                StandardCardContainerUI()
+            }
+
+            item {
+                CompactCardUi()
+            }
+
+            item {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.Black
+                )
+            }
+
+            item {
+                Button(
+                    onClick = { /* handle action */ }
+                ) {
+                    Text("TV Button")
+                }
             }
         }
+
     }
 }
 

@@ -141,7 +141,8 @@ fun DashBoardScreen(navController: NavHostController) {
                 HomeScreen(navController = navController) // parent navController for app-level navigation
             }
             composable(Screen.SearchScreen.route) {
-                TvCategoriesScreen()
+              //  TvCategoriesScreen()
+                TvScreenContent("ProfileScreen")
             }
             composable(Screen.FavoritesScreen.route) {
                 PageContent(1)

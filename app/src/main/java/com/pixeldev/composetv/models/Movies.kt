@@ -19,7 +19,9 @@ data class Movies(
     @SerialName("popularity") var popularity: Double? = null,
     @SerialName("poster_path") var posterPath: String? = null,
     @SerialName("release_date") var releaseDate: String? = null,
+    @SerialName("first_air_date") var first_air_date: String? = null,
     @SerialName("title") var title: String? = null,
+    @SerialName("name") var name: String? = null,
     @SerialName("video") var video: Boolean? = null,
     @SerialName("vote_average") var voteAverage: Double? = null,
     @SerialName("vote_count") var voteCount: Int? = null

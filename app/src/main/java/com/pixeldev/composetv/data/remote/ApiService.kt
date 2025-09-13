@@ -226,7 +226,7 @@ suspend fun getTrendingMovies(
 
     suspend fun getSimilarTvShows(
         filmId: Int,
-        page: Int = 0,
+        page: Int = 1,
         apiKey: String = API_KEY,
         language: String = "en-US"
     ): MovieResponse {
@@ -239,7 +239,7 @@ suspend fun getTrendingMovies(
     }
 
     suspend fun getTrendingTvSeries(
-        page: Int = 0,
+        page: Int = 1,
         apiKey: String = API_KEY,
         language: String = "en-US"
     ): MovieResponse {
@@ -252,7 +252,7 @@ suspend fun getTrendingMovies(
     }
 
     suspend fun getPopularTvShows(
-        page: Int = 0,
+        page: Int = 1,
         apiKey: String = API_KEY,
         language: String = "en-US"
     ): MovieResponse {
@@ -265,7 +265,7 @@ suspend fun getTrendingMovies(
     }
 
     suspend fun getTopRatedTvShows(
-        page: Int = 0,
+        page: Int = 1,
         apiKey: String = API_KEY,
         language: String = "en-US"
     ): MovieResponse {
@@ -279,7 +279,7 @@ suspend fun getTrendingMovies(
 
     suspend fun getRecommendedTvShows(
         filmId: Int,
-        page: Int = 0,
+        page: Int = 1,
         apiKey: String = API_KEY,
         language: String = "en-US"
     ): MovieResponse {
@@ -292,7 +292,7 @@ suspend fun getTrendingMovies(
     }
 
     suspend fun getDiscoverTvShows(
-        page: Int = 0,
+        page: Int = 1,
         gteFirstAirDate: String = "1940-01-01",
         lteFirstAirDate: String = "1981-01-01",
         apiKey: String = API_KEY,

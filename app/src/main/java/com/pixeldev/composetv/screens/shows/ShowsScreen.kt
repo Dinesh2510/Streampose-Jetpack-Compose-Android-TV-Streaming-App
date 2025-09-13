@@ -13,116 +13,262 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.tv.material3.Card
+import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.Carousel
 import androidx.tv.material3.CarouselDefaults
 import androidx.tv.material3.CarouselState
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.StandardCardContainer
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.pixeldev.composetv.data.remote.response.GenreResponse
+import com.pixeldev.composetv.data.remote.response.MovieResponse
+import com.pixeldev.composetv.models.Genre
+import com.pixeldev.composetv.models.Movies
+import com.pixeldev.composetv.screens.home.GenreItem
 import com.pixeldev.composetv.screens.movie.Movie
-fun generateDummyMovies(): List<Movie> {
-    return listOf(
-        Movie(
-            id = "1",
-            title = "House of Cards",
-            imageUrl = "https://picsum.photos/id/1045/800/450", // Dummy image
-            category = "TV Series",
-            rating = "4.3",
-            year = "2013-2018",
-            duration = "45 min",
-            description = "A Congressman works with his equally conniving wife to exact revenge on the people who betrayed him."
-        ),
-        Movie(
-            id = "2",
-            title = "Bad Boys",
-            imageUrl = "https://picsum.photos/id/1045/800/450", // Dummy image
-            category = "Action",
-            rating = "4.6",
-            year = "1995",
-            duration = "120 min",
-            description = "Two hip detectives protect a witness to a murder while investigating a case of stolen heroin from the evidence storage room."
-        ),
-        Movie(
-            id = "3",
-            title = "Godzilla",
-            imageUrl = "https://placekitten.com/400/302", // Dummy image
-            category = "Sci-Fi",
-            rating = "4.5",
-            year = "2014",
-            duration = "123 min",
-            description = "The world is on the brink of collapse as a giant monster threatens humanity, while a group of scientists attempt to prevent its destruction."
-        ),
-        Movie(
-            id = "4",
-            title = "Alienoid",
-            imageUrl = "https://picsum.photos/id/1045/800/450", // Dummy image
-            category = "Sci-Fi",
-            rating = "4.2",
-            year = "2022",
-            duration = "140 min",
-            description = "Two worlds collide in a tale of time-travel and alien encounters as humans and extraterrestrials must battle for survival."
-        ),
-        Movie(
-            id = "5",
-            title = "Avengers: Endgame",
-            imageUrl = "https://picsum.photos/id/1045/800/450", // Dummy image
-            category = "Action",
-            rating = "4.8",
-            year = "2019",
-            duration = "181 min",
-            description = "The Avengers assemble once again to undo the devastation caused by Thanos, who wiped out half of all life in the universe."
-        ),
-        Movie(
-            id = "6",
-            title = "Justice League",
-            imageUrl = "https://picsum.photos/id/1045/800/450", // Dummy image
-            category = "Superhero",
-            rating = "4.0",
-            year = "2017",
-            duration = "120 min",
-            description = "Batman and Wonder Woman work together to assemble a team of superheroes to save the world from an impending alien invasion."
-        ),
-        Movie(
-            id = "7",
-            title = "The Dark Knight",
-            imageUrl = "https://picsum.photos/id/1045/800/450", // Dummy image
-            category = "Action",
-            rating = "4.9",
-            year = "2008",
-            duration = "152 min",
-            description = "Batman faces off against the Joker, a criminal mastermind who seeks to create chaos and anarchy in Gotham City."
-        ),
-        Movie(
-            id = "8",
-            title = "Inception",
-            imageUrl = "https://picsum.photos/id/1045/800/450", // Dummy image
-            category = "Sci-Fi",
-            rating = "4.7",
-            year = "2010",
-            duration = "148 min",
-            description = "A thief who steals secrets by entering people's dreams is given the task of planting an idea into the mind of a CEO."
-        )
+import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_780
+import com.pixeldev.composetv.utlis.GenreWithSubtitle
+import com.pixeldev.composetv.utlis.MovieState
+import com.pixeldev.composetv.utlis.SectionHeader
+import com.pixeldev.composetv.utlis.TVGradientLoadingIndicator
+import com.pixeldev.composetv.utlis.tvGenresWithSubtitles
+
+@Composable
+fun AllShowsScreen(
+    navHostController: NavHostController,
+    viewModel: ShowViewModel = hiltViewModel()
+) {
+    LaunchedEffect(Unit) {
+        viewModel.fetchTrendingTvShows()
+        viewModel.fetchAllTvShows() // pass a filmId to get recommended shows
+    }
+
+    val categoriesState by viewModel.categoriesState.collectAsState()
+    val trendingTvShowsState by viewModel.trendingTvShows.collectAsState()
+
+    LazyColumn {
+        item {
+            when (trendingTvShowsState) {
+                is MovieState.Error -> {
+
+                }
+
+                MovieState.Loading -> {
+                    Box {
+                        TVGradientLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                }
+
+                is MovieState.Success<*> -> {
+                    val data = (trendingTvShowsState as MovieState.Success<MovieResponse?>).data
+                    if (data is MovieResponse) {
+                        HeroCarousel(heroList = data.results)
+                    }
+                }
+            }
+        }
+        categoriesState.forEach { (category, state) ->
+            item {
+                SectionHeader(category)
+            }
+
+            when (state) {
+                is MovieState.Loading -> {
+                    item {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            TVGradientLoadingIndicator()
+                        }
+                    }
+                }
+
+                is MovieState.Error -> {
+                    item {
+                        Text(
+                            text = "Error: ${state.message}",
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+
+                is MovieState.Success<*> -> {
+                    val data = state.data
+
+                    if (data is MovieResponse) {
+                        // Horizontal list of TV shows
+                        item {
+                            LazyRow(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 0.dp), // Or remove this line
+                                contentPadding = PaddingValues(
+                                    start = 24.dp,
+                                    end = 24.dp
+                                ), // Control padding here
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(data.results) { showInt ->
+                                    TVShowCardContainerUI(showInt)
+                                }
+                            }
+                        }
+                    } else if (data is GenreResponse) {
+                        item {
+                            val enrichedList: List<GenreWithSubtitle> = data.genres.map { it.toWithSubtitle() }
+
+                            val enriched = data.genres.map { it.toWithSubtitle() }
+                            val genres: List<Genre> = data.genres
+
+                            val enrichedGenres: List<GenreWithSubtitle> = genres.map { genre ->
+                                genre.toWithSubtitle()
+                            }
+
+                            LazyRow(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 0.dp), // Or remove this line
+                                contentPadding = PaddingValues(
+                                    start = 24.dp,
+                                    end = 24.dp
+                                ), // Control padding here
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(enrichedGenres) { genre ->
+                                    GenreItem(
+                                        genre = genre,
+                                        modifier = Modifier,
+                                        onClick = { }
+                                    )
+                                }
+                            }
+
+                        }
+                    } else {
+                        item {
+                            Text("Unknown data for $category")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+fun GenreItem(
+    modifier: Modifier = Modifier,
+    genre: GenreWithSubtitle,
+    onClick: () -> Unit
+) {
+    val gradiantColors = arrayOf(
+        .6f to MaterialTheme.colorScheme.surfaceVariant,
+        1f to Color.Transparent
     )
+    Card(
+        colors = CardDefaults.colors(Color.Transparent),
+        onClick = onClick,
+    ) {
+        Box(
+            modifier = Modifier.clip(MaterialTheme.shapes.small),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            AsyncImage(
+                modifier = modifier
+                    .size(280.dp, 80.dp)
+                    .drawWithContent {
+                        drawContent()
+                        drawRect(Brush.horizontalGradient(colorStops = gradiantColors))
+                    },
+                model = genre.name,
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+            Column(modifier = Modifier.padding(start = 16.dp)) {
+                Text(
+                    modifier = Modifier.width(180.dp),
+                    text = genre.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    modifier = Modifier.width(200.dp),
+                    text = genre.subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+fun Genre.toWithSubtitle(): GenreWithSubtitle {
+    return tvGenresWithSubtitles.find { it.id == this.id }
+        ?: GenreWithSubtitle(id!!, name, "Top ${name} TV Shows")
 }
 
 @Composable
-fun AllShowsScreen(navHostController: NavHostController){
-    ShowsScreen(generateDummyMovies(), generateDummyMovies(), generateDummyMovies(),generateDummyMovies())
+fun TVShowCardContainerUI(data: Movies) {
+    StandardCardContainer(
+        modifier = Modifier
+            .width(200.dp)
+            .padding(horizontal = 4.dp),
+        imageCard = {
+            Card(
+                onClick = { },
+                interactionSource = it,
+                colors = CardDefaults.colors(containerColor = Color.Transparent)
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(BASE_BACKDROP_IMAGE_URL_780 + data.backdropPath)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = data.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(CardDefaults.HorizontalImageAspectRatio),
+                )
+            }
+        },
+        title = {
+            Text(
+                text = data.name ?: "",
+                maxLines = 1,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        },
+        subtitle = {
+            val rating = data.voteAverage?.let { String.format("%.1f", it) } ?: "-"
+            val year = data.first_air_date?.take(4) ?: "-"
 
+            Text(
+                text = "⭐ $rating · $year",
+            )
+        },
+    )
 }
 
 @Composable
@@ -138,9 +284,7 @@ fun ShowsScreen(
             .background(Color.Black),
         contentPadding = PaddingValues(vertical = 0.dp)
     ) {
-        item {
-            HeroCarousel(heroList = heroList)
-        }
+
         item {
             HorizontalMovieRow(title = "Recommended Films", movies = recommendedFilms)
         }
@@ -155,11 +299,11 @@ fun ShowsScreen(
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun HeroCarousel(heroList: List<Movie>) {
+fun HeroCarousel(heroList: ArrayList<Movies>) {
     val carouselState = remember { CarouselState(initialActiveItemIndex = 0) }
 
     Carousel(
-        itemCount = heroList.size,
+        itemCount = heroList.take(5).size,
         modifier = Modifier
             .fillMaxWidth()
             .height(300.dp),  // adjust height as needed
@@ -174,7 +318,7 @@ fun HeroCarousel(heroList: List<Movie>) {
         carouselIndicator = {
             // default indicator; can customize dots or style
             CarouselDefaults.IndicatorRow(
-                itemCount = heroList.size,
+                itemCount = heroList.take(5).size,
                 activeItemIndex = carouselState.activeItemIndex,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -189,14 +333,15 @@ fun HeroCarousel(heroList: List<Movie>) {
 
         ) {
             AsyncImage(
-                model = movie.imageUrl,
+                model = BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath,
                 contentDescription = movie.title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
             // Overlay text etc
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(
@@ -211,14 +356,14 @@ fun HeroCarousel(heroList: List<Movie>) {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = movie.title,
+                    text = movie.name ?: "",
                     color = Color.White,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = movie.description,
+                    text = movie.overview ?: "",
                     color = Color.White.copy(alpha = 0.8f),
                     fontSize = 14.sp,
                     maxLines = 2,
@@ -252,20 +397,21 @@ fun HorizontalMovieRow(title: String, movies: List<Movie>) {
 @Composable
 fun TvLazyRow(movies: List<Movie>) {
     // tvFoundation provides TvLazyRow etc, or you can use LazyRow from Compose tv
-   LazyRow(
-       modifier = Modifier
-           .fillMaxWidth(),
-       horizontalArrangement = Arrangement.spacedBy(24.dp),
-       contentPadding = PaddingValues(horizontal = 32.dp)
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        contentPadding = PaddingValues(horizontal = 32.dp)
     ) {
         items(movies) { movie ->
             CustomCard(
                 imageUrl = movie.imageUrl,
-                onClick = {  }
+                onClick = { }
             )
         }
     }
 }
+
 @Composable
 fun CustomCard(
     modifier: Modifier = Modifier,
@@ -276,8 +422,9 @@ fun CustomCard(
     Card(
         onClick = onClick,
         modifier = modifier
-            .width(160.dp).height(250.dp)
-           // .aspectRatio(cardAspectRatio) // Ensures the card follows 9:16 aspect ratio
+            .width(160.dp)
+            .height(250.dp)
+            // .aspectRatio(cardAspectRatio) // Ensures the card follows 9:16 aspect ratio
             .background(Color.Transparent, RoundedCornerShape(16.dp))
             .padding(bottom = 8.dp),
     ) {
@@ -312,7 +459,7 @@ fun MovieCard(movie: Movie) {
             modifier = Modifier
                 .fillMaxSize()
                 .then(if (isFocused) Modifier.background(Color.White.copy(alpha = 0.2f)) else Modifier)
-                // optionally add scale on focus etc
+            // optionally add scale on focus etc
         )
         // Title overlay, rating etc, as per design
         Column(
@@ -329,8 +476,8 @@ fun MovieCard(movie: Movie) {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-           /* val rating = String.format("%.1f", movie.rating)
-            val year = movie.year.take(4)*/
+            /* val rating = String.format("%.1f", movie.rating)
+             val year = movie.year.take(4)*/
             Text(
                 text = "⭐ 4.2 · 2025",
                 color = Color.White,

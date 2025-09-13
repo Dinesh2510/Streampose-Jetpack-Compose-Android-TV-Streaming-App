@@ -498,7 +498,7 @@ fun MovieCard(
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-        AsyncImage(
+      /*  AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath)
                 .crossfade(true)
@@ -527,7 +527,7 @@ fun MovieCard(
             contentDescription = "Background Poster",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
-        )
+        )*/
 
     }
 }

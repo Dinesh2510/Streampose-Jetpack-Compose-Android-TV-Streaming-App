@@ -47,6 +47,7 @@ import com.pixeldev.composetv.models.Genre
 import com.pixeldev.composetv.models.Movies
 import com.pixeldev.composetv.screens.categories.ErrorScreen
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_300
+import com.pixeldev.composetv.utlis.GenreWithSubtitle
 import com.pixeldev.composetv.utlis.MovieState
 import com.pixeldev.composetv.utlis.TVGradientLoadingIndicator
 
@@ -344,7 +345,7 @@ fun GenreSection(genres: List<Genre>?) {
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-private fun GenreItem(
+fun GenreItem(
     modifier: Modifier = Modifier,
     genre: Genre,
     onClick: () -> Unit

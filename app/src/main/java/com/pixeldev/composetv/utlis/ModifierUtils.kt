@@ -48,6 +48,7 @@ import androidx.tv.material3.Text
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.pixeldev.composetv.data.remote.response.MovieResponse
+import com.pixeldev.composetv.models.Genre
 
 /**
  * Handles horizontal (Left & Right) D-Pad Keys and consumes the event(s) so that the focus doesn't
@@ -275,3 +276,28 @@ fun SectionHeader(title: String) {
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
     )
 }
+
+data class GenreWithSubtitle(
+    val id: Int,
+    val name: String,
+    val subtitle: String
+)
+
+val tvGenresWithSubtitles = listOf(
+    GenreWithSubtitle(10759, "Action & Adventure", "High-octane series & heroic quests"),
+    GenreWithSubtitle(16, "Animation", "Colorful stories for all ages"),
+    GenreWithSubtitle(35, "Comedy", "Laugh-out-loud TV moments"),
+    GenreWithSubtitle(80, "Crime", "Mystery, law, and gripping investigations"),
+    GenreWithSubtitle(99, "Documentary", "True stories that educate and inspire"),
+    GenreWithSubtitle(18, "Drama", "Emotional and intense storytelling"),
+    GenreWithSubtitle(10751, "Family", "Fun content for all generations"),
+    GenreWithSubtitle(10762, "Kids", "Entertaining content for young minds"),
+    GenreWithSubtitle(9648, "Mystery", "Unravel secrets and unexpected twists"),
+    GenreWithSubtitle(10763, "News", "Current events and breaking updates"),
+    GenreWithSubtitle(10764, "Reality", "Unscripted and unpredictable entertainment"),
+    GenreWithSubtitle(10765, "Sci-Fi & Fantasy", "Otherworldly adventures and tech wonders"),
+    GenreWithSubtitle(10766, "Soap", "Melodrama and daily relationship sagas"),
+    GenreWithSubtitle(10767, "Talk", "Interviews, discussions, and debates"),
+    GenreWithSubtitle(10768, "War & Politics", "Power struggles and wartime drama"),
+    GenreWithSubtitle(37, "Western", "Cowboys, duels, and dusty trails")
+)
