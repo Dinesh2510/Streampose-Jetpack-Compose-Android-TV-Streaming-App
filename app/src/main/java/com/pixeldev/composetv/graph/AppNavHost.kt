@@ -37,6 +37,7 @@ import androidx.tv.material3.rememberDrawerState
 import com.pixeldev.composetv.screens.categories.CategoryDetails
 import com.pixeldev.composetv.screens.categories.CategoryScreen
 import com.pixeldev.composetv.screens.details.MovieDetailsScreen
+import com.pixeldev.composetv.screens.favourite.FavouriteScreen
 import com.pixeldev.composetv.screens.home.HomeScreen
 import com.pixeldev.composetv.screens.home.Page
 import com.pixeldev.composetv.screens.home.PageContent
@@ -145,7 +146,8 @@ fun DashBoardScreen(navController: NavHostController) {
                 TvScreenContent("ProfileScreen")
             }
             composable(Screen.FavoritesScreen.route) {
-                PageContent(1)
+               // PageContent(1)
+                FavouriteScreen()
             }
             composable(Screen.SettingsScreen.route) {
                 SettingScreen()
