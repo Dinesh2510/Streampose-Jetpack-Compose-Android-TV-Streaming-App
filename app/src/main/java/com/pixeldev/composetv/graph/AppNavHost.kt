@@ -1,5 +1,6 @@
 package com.pixeldev.composetv.graph
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,9 +25,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.tv.material3.DrawerValue
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
@@ -51,6 +54,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavHost(navController: NavHostController = rememberNavController()) {
+    val Movie_Details_ID ="movieId"
+
     NavHost(navController = navController, startDestination = Screen.Splash.route) {
         composable(Screen.Splash.route) {
             SplashScreen(navController = navController)
@@ -61,14 +66,18 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         composable(Screen.UserDetails.route) {
 
         }
-        composable(Screen.MovieDetails.route) {   // ✅ new screen
+        composable(
+            route =  Screen.MovieDetails.route + "/{$Movie_Details_ID}",
+            arguments = listOf(navArgument(Movie_Details_ID) { type = NavType.StringType })
+        ) { backStackEntry ->
+            val movieId = backStackEntry.arguments?.getString(Movie_Details_ID) ?: return@composable
+
             MovieDetailsScreen(
+                movieId = movieId,
                 onBackPressed = { navController.popBackStack() },
-                goToMoviePlayer = {
-                    // TODO: handle play action, maybe navigate to player
-                }
             )
         }
+
         composable(Screen.CategoryDetailsScreen.route) {
             CategoryDetails(navController)
         }

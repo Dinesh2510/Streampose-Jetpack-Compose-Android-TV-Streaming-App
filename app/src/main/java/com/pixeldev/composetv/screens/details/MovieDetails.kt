@@ -1,48 +1,45 @@
-/*
- * Copyright 2023 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.pixeldev.composetv.screens.details
 
+import android.widget.Space
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.OndemandVideo
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Button
@@ -53,6 +50,11 @@ import androidx.tv.material3.ShapeDefaults
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.pixeldev.composetv.data.remote.response.MovieDetailsDTO
+import com.pixeldev.composetv.models.Genre
+import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_1280
+import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_300
+import com.pixeldev.composetv.utlis.Constants.Companion.BASE_POSTER_IMAGE_URL
 import com.pixeldev.composetv.utlis.TitleValueText
 import com.pixeldev.composetv.utlis.rememberChildPadding
 import kotlinx.coroutines.launch
@@ -60,7 +62,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MovieDetails(
-    goToMoviePlayer: () -> Unit
+    goToMoviePlayer: () -> Unit,
+    movieDetails: MovieDetailsDTO
 ) {
     val childPadding = rememberChildPadding()
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
@@ -73,6 +76,7 @@ fun MovieDetails(
             .bringIntoViewRequester(bringIntoViewRequester)
     ) {
         MovieImageWithGradients(
+            BASE_BACKDROP_IMAGE_URL_1280 + movieDetails.backdropPath,
             modifier = Modifier.fillMaxSize()
         )
 
@@ -81,20 +85,35 @@ fun MovieDetails(
             Column(
                 modifier = Modifier.padding(start = childPadding.start)
             ) {
-                MovieLargeTitle(movieTitle = "movieDetails.name")
+                MovieLargeTitle(movieTitle = movieDetails.title)
 
                 Column(
                     modifier = Modifier.alpha(0.75f)
                 ) {
-                    MovieDescription(description = "description")
+                    MovieDescription(description = movieDetails.overview ?: "")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    // IMDb + Duration + Year
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        val rating =
+                            movieDetails.voteAverage?.let { String.format("%.1f", it) } ?: "-"
+                        Text("IMDb $rating", color = Color.White)
+                        Text(
+                            "${movieDetails.runtime?.div(60)} h ${movieDetails.runtime?.rem(60)} min",
+                            color = Color.White
+                        )
+                        Text(movieDetails.releaseDate.take(4), color = Color.White)
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    // Badges row (X-RAY, HDR, UHD, etc.)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        BadgeChip("HDR")
+                        BadgeChip("UHD")
+                        BadgeChip("AD")
+                    }
+
                     DotSeparatedRow(
                         modifier = Modifier.padding(top = 20.dp),
-                        texts = listOf(
-                            "pgRating",
-                            "releaseDate",
-                           " categories.joinToString(", ")",
-                            "duration"
-                        )
+                        texts = movieDetails.genres
                     )
                     DirectorScreenplayMusicRow(
                         director = "director",
@@ -102,14 +121,40 @@ fun MovieDetails(
                         music = "music"
                     )
                 }
-                WatchTrailerButton(
-                    modifier = Modifier.onFocusChanged {
-                        if (it.isFocused) {
-                            coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
-                        }
-                    },
-                    goToMoviePlayer = goToMoviePlayer
-                )
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    WatchTrailerButton(
+                        title = "Watch Now",
+                        imageVector = Icons.Outlined.PlayArrow,
+                        modifier = Modifier.onFocusChanged {
+                            if (it.isFocused) {
+                                coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                            }
+                        },
+                        goToMoviePlayer = goToMoviePlayer
+                    )
+
+                    WatchTrailerButton(
+                        title = "Watch Trailer",
+                        imageVector = Icons.Outlined.OndemandVideo,
+                        modifier = Modifier.onFocusChanged {
+                            if (it.isFocused) {
+                                coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                            }
+                        },
+                        goToMoviePlayer = goToMoviePlayer
+                    )
+
+                    WatchTrailerButton(
+                        title = "Add to favourite",
+                        imageVector = Icons.Outlined.FavoriteBorder,
+                        modifier = Modifier.onFocusChanged {
+                            if (it.isFocused) {
+                                coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                            }
+                        },
+                        goToMoviePlayer = goToMoviePlayer
+                    )
+                }
             }
         }
     }
@@ -118,7 +163,9 @@ fun MovieDetails(
 @Composable
 private fun WatchTrailerButton(
     modifier: Modifier = Modifier,
-    goToMoviePlayer: () -> Unit
+    goToMoviePlayer: () -> Unit,
+    title: String,
+    imageVector: ImageVector
 ) {
     Button(
         onClick = goToMoviePlayer,
@@ -127,12 +174,12 @@ private fun WatchTrailerButton(
         shape = ButtonDefaults.shape(shape = ShapeDefaults.ExtraSmall)
     ) {
         Icon(
-            imageVector = Icons.Outlined.PlayArrow,
+            imageVector = imageVector,
             contentDescription = null
         )
         Spacer(Modifier.size(8.dp))
         Text(
-            text = "watch_trailer",
+            text = title,
             style = MaterialTheme.typography.titleSmall
 
         )
@@ -178,6 +225,7 @@ private fun MovieDescription(description: String) {
             fontSize = 15.sp,
             fontWeight = FontWeight.Normal
         ),
+        color = Color.White,
         modifier = Modifier.padding(top = 8.dp),
         maxLines = 2
     )
@@ -197,12 +245,13 @@ private fun MovieLargeTitle(movieTitle: String) {
 
 @Composable
 private fun MovieImageWithGradients(
+    imageUrl: String,
     modifier: Modifier = Modifier,
     gradientColor: Color = MaterialTheme.colorScheme.background,
 ) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
-            .data("https://picsum.photos/id/111/300/180")
+            .data(imageUrl)
             .crossfade(true)
             .build(),
         contentDescription = "",
@@ -231,8 +280,8 @@ private fun MovieImageWithGradients(
             drawRect(
                 Brush.horizontalGradient(
                     colors = listOf(Color.Transparent, gradientColor.copy(alpha = 0.9f)), // ✅ alpha
-                    startX = size.width ,
-                    endX = size.width/ 2f
+                    startX = size.width,
+                    endX = size.width / 2f
                 )
             )
 
@@ -248,3 +297,25 @@ private fun MovieImageWithGradients(
     )
 }
 
+
+@Composable
+fun BadgeChip(text: String) {
+    Box(
+        modifier = Modifier
+            .background(Color.DarkGray, RoundedCornerShape(4.dp))
+            .padding(horizontal = 6.dp, vertical = 2.dp)
+    ) {
+        Text(text, style = MaterialTheme.typography.labelSmall, color = Color.White)
+    }
+}
+
+@Composable
+fun GenreChip(name: String) {
+    Box(
+        modifier = Modifier
+            .border(1.dp, Color.Gray, RoundedCornerShape(50))
+            .padding(horizontal = 12.dp, vertical = 4.dp)
+    ) {
+        Text(name, style = MaterialTheme.typography.bodySmall, color = Color.White)
+    }
+}

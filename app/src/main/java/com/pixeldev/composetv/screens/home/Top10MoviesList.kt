@@ -59,6 +59,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import androidx.tv.material3.Border
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.MaterialTheme
@@ -71,18 +72,21 @@ import coil.request.ImageRequest
 import com.pixeldev.composetv.utlis.rememberChildPadding
 import com.pixeldev.composetv.R
 import com.pixeldev.composetv.data.remote.response.MovieResponse
+import com.pixeldev.composetv.graph.Screen
 import com.pixeldev.composetv.models.Movies
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_300
 import com.pixeldev.composetv.utlis.bringIntoViewIfChildrenAreFocused
 
 @Composable
-fun Top10MoviesListPreview(trendingMovie: MovieResponse?) {
+fun Top10MoviesListPreview(trendingMovie: MovieResponse?, navController: NavHostController) {
     val context = LocalContext.current
     var movieResponse = trendingMovie!!.results
 
     Top10MoviesList(
         movieList = movieResponse,
-        onMovieClick = { }
+        onMovieClick = { movie ->
+            navController.navigate(Screen.MovieDetails.route + "/${movie.id}")
+        }
     )
 }
 

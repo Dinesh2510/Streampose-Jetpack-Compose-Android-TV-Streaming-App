@@ -47,7 +47,6 @@ import com.pixeldev.composetv.models.Genre
 import com.pixeldev.composetv.models.Movies
 import com.pixeldev.composetv.screens.categories.ErrorScreen
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_300
-import com.pixeldev.composetv.utlis.GenreWithSubtitle
 import com.pixeldev.composetv.utlis.MovieState
 import com.pixeldev.composetv.utlis.TVGradientLoadingIndicator
 
@@ -172,23 +171,26 @@ fun MovieContent(
             )
         }
         item {
-            Top10MoviesListPreview(trendingMovie = trendingMovie)
+            Top10MoviesListPreview(trendingMovie = trendingMovie, navController)
         }
 
         item {
             MovieSection(
                 title = "Discovery Movies",
                 movies = discoveryMovie?.results,
-                onClickMovieCard = {
-                    navController.navigate(Screen.MovieDetails.route)
-                })
+                onClickMovieCard = { movieId ->
+                    navController.navigate(Screen.MovieDetails.route + "/${movieId}")
+                }
+            )
         }
 
         item {
             MovieSection(
                 title = "Trending Movies",
                 movies = trendingMovie?.results,
-                onClickMovieCard = { navController.navigate(Screen.MovieDetails.route) }
+                onClickMovieCard = { movieId ->
+                    navController.navigate(Screen.MovieDetails.route + "/${movieId}")
+                }
             )
         }
 
@@ -196,7 +198,9 @@ fun MovieContent(
             MovieSection(
                 title = "Now Playing Movies",
                 movies = nowPlayingMovie?.results,
-                onClickMovieCard = { navController.navigate(Screen.MovieDetails.route) }
+                onClickMovieCard = { movieId ->
+                    navController.navigate(Screen.MovieDetails.route + "/${movieId}")
+                }
             )
         }
 
@@ -204,7 +208,9 @@ fun MovieContent(
             MovieSection(
                 title = "Upcoming Movies",
                 movies = upcomingMovie?.results,
-                onClickMovieCard = { navController.navigate(Screen.MovieDetails.route) }
+                onClickMovieCard = { movieId ->
+                    navController.navigate(Screen.MovieDetails.route + "/${movieId}")
+                }
             )
         }
 
@@ -216,7 +222,11 @@ fun MovieContent(
 }
 
 @Composable
-fun MovieSection(title: String, movies: ArrayList<Movies>?, onClickMovieCard: () -> Unit) {
+fun MovieSection(
+    title: String,
+    movies: ArrayList<Movies>?,
+    onClickMovieCard: (movieId: Int) -> Unit
+) {
     Column {
         SectionHeader(title)
 
@@ -230,12 +240,11 @@ fun MovieSection(title: String, movies: ArrayList<Movies>?, onClickMovieCard: ()
             items(movies ?: emptyList()) { movie ->
                 TvCardItem(
                     movie
-                ) { onClickMovieCard() }
+                ) { movie.id?.toInt()?.let { onClickMovieCard(it) } }
             }
         }
     }
 }
-
 
 
 @Composable
@@ -252,14 +261,14 @@ fun TvCardItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(CardDefaults.HorizontalImageAspectRatio),
-                painter = rememberAsyncImagePainter( BASE_BACKDROP_IMAGE_URL_300 + movie.backdropPath ),
+                painter = rememberAsyncImagePainter(BASE_BACKDROP_IMAGE_URL_300 + movie.backdropPath),
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds
             )
         },
         title = {
             Text(
-                text = movie.title?:"",
+                text = movie.title ?: "",
                 modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)
             )
         },
@@ -329,7 +338,7 @@ fun GenreSection(genres: List<Genre>?) {
                 .padding(horizontal = 0.dp), // Or remove this line
             contentPadding = PaddingValues(start = 24.dp, end = 24.dp), // Control padding here
             horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ){
+        ) {
             items(genres ?: emptyList()) { genre ->
                 GenreItem(
                     genre = genre,
@@ -340,7 +349,6 @@ fun GenreSection(genres: List<Genre>?) {
         }
     }
 }
-
 
 
 @OptIn(ExperimentalTvMaterial3Api::class)
@@ -412,6 +420,7 @@ fun GenreCard(genre: Genre) {
         }
     }
 }
+
 @Composable
 fun ErrorContent(states: List<MovieState<*>>) {
     Column(modifier = Modifier.padding(32.dp)) {

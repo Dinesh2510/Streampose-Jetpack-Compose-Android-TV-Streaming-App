@@ -1,19 +1,3 @@
-/*
- * Copyright 2023 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.pixeldev.composetv.screens.details
 
 import androidx.compose.foundation.BorderStroke
@@ -33,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Border
 import androidx.tv.material3.ClickableSurfaceDefaults
@@ -44,12 +27,14 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import androidx.tv.material3.surfaceColorAtElevation
 import com.pixeldev.composetv.utlis.rememberChildPadding
-import com.pixeldev.composetv.R
+import com.pixeldev.composetv.data.remote.response.MovieDetailsDTO
+import com.pixeldev.composetv.utlis.SectionHeader
 
 
 @Composable
 fun MovieReviews(
     modifier: Modifier = Modifier,
+    movie: MovieDetailsDTO,
 ) {
     val childPadding = rememberChildPadding()
     Column(
@@ -57,17 +42,24 @@ fun MovieReviews(
             .padding(horizontal = childPadding.start)
             .padding(bottom = childPadding.bottom)
     ) {
-        Text(text = stringResource(R.string.app_name), style = MaterialTheme.typography.titleMedium)
+        SectionHeader("Reviews")
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(20.dp)
-        ) {/*
-            reviewsAndRatings.forEach { reviewAndRating ->
-
-            }*/
+        ) {
             Review(
+                "Imdb",
+                movie.voteAverage,
+                movie.voteCount,
+                modifier
+                    .weight(1f)
+                    .height(96.dp)
+            )
+            Review(
+                "Imdb",
+                movie.voteAverage,
+                movie.voteCount,
                 modifier
                     .weight(1f)
                     .height(96.dp)
@@ -78,6 +70,9 @@ fun MovieReviews(
 
 @Composable
 private fun Review(
+    title: String,
+    voteAvg: Double,
+    voteCount: Long,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -128,18 +123,18 @@ private fun Review(
                     modifier = Modifier.padding(start = 16.dp)
                 ) {
                     Text(
-                        text = "reviewerName",
+                        text = title,
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "sss",
+                        text = voteCount.toString(),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.alpha(0.75f)
                     )
                 }
             }
             Text(
-                text = "reviewRating",
+                text = voteAvg.toString(),
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(end = 16.dp)
             )
