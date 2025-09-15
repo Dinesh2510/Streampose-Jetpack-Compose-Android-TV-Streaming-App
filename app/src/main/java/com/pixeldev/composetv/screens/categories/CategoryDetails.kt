@@ -198,52 +198,12 @@ private fun TabPanels(selectedTabIndex: Int, viewModel: HomeViewModel) {
                     items(genresWiseMoviePagination.itemCount) { i ->
                         val movie = genresWiseMoviePagination[i]
                         if (movie != null) {
-                            /* PortraitMovieCard(
+                             PortraitMovieCard(
                                  title = movie.title ?: "",
                                  posterUrl = BASE_POSTER_IMAGE_URL + (movie.posterPath ?: "")
                              ) {
                                  // TODO: onClick handle
-                             }*/
-                            BorderedFocusableItem(
-                                onClick = {
-
-                                },
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .aspectRatio(0.6f),
-                            ) {
-                                Box(
-                                    contentAlignment = Alignment.Center,
-                                    modifier = Modifier.fillMaxSize()
-                                ) {
-
-                                    AsyncImage(
-                                        model = BASE_POSTER_IMAGE_URL + (movie.posterPath ?: ""),
-                                        contentDescription = movie.title,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                    Box(
-                                        modifier = Modifier
-                                            .align(Alignment.BottomCenter)
-                                            .fillMaxWidth()
-                                            .background(Color.Black.copy(alpha = 0.6f))
-                                            .padding(6.dp)
-                                    ) {
-                                        Text(
-                                            text = movie.title ?: "",
-                                            color = Color.White,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            textAlign = TextAlign.Center,
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
-
-                                }
-
-                            }
+                             }
                         } else {
                             // Placeholder skeleton / shimmer item
                             Box(
@@ -307,6 +267,50 @@ private fun TabPanels(selectedTabIndex: Int, viewModel: HomeViewModel) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PortraitMovieCard(title: String, posterUrl: String, content: @Composable () -> Unit) {
+    BorderedFocusableItem(
+        onClick = {
+
+        },
+        modifier = Modifier
+            .padding(8.dp)
+            .aspectRatio(0.6f),
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+
+            AsyncImage(
+                model =  posterUrl,
+                contentDescription = title,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(alpha = 0.6f))
+                    .padding(6.dp)
+            ) {
+                Text(
+                    text = title,
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+        }
+
     }
 }
 

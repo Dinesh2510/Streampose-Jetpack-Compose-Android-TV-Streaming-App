@@ -45,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.toUpperCase
 import androidx.tv.material3.Border
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ClassicCard
@@ -53,6 +54,8 @@ import androidx.tv.material3.Surface
 import coil.compose.rememberAsyncImagePainter
 import com.pixeldev.composetv.utlis.SectionHeader
 import com.pixeldev.composetv.utlis.TitleValueText
+import com.pixeldev.composetv.utlis.formatToMillions
+import java.util.Locale
 
 @Composable
 fun MovieDetailsScreen(
@@ -72,7 +75,7 @@ fun MovieDetailsScreen(
         viewModel.fetchCasteOfMovies(movieId)
     }
 
-    Details(
+    SetDetails(
         goToMoviePlayer = { },
         onBackPressed = onBackPressed,
         movieDetailsState = movieDetailsState,
@@ -85,7 +88,7 @@ fun MovieDetailsScreen(
 }
 
 @Composable
-private fun Details(
+private fun SetDetails(
     goToMoviePlayer: () -> Unit,
     onBackPressed: () -> Unit,
     movieDetailsState: MovieState<MovieDetailsDTO?>,
@@ -95,79 +98,59 @@ private fun Details(
 ) {
     val childPadding = rememberChildPadding()
     BackHandler(onBack = onBackPressed)
+    val movieDetails = (movieDetailsState as? MovieState.Success)?.data
+    val castList = (castState as? MovieState.Success)?.data ?: emptyList()
+    val similarMovies = (similarMoviesState as? MovieState.Success)?.data?.results ?: emptyList()
+
 
     LazyColumn(
         contentPadding = PaddingValues(bottom = 135.dp),
         modifier = modifier,
-    ) {
-        // Movie details
+    ) { // Movie Details
         item {
-            when (movieDetailsState) {
-                is MovieState.Loading -> Box {
-                    TVGradientLoadingIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-
-                is MovieState.Error -> ErrorStrip(movieDetailsState.message)
-                is MovieState.Success -> {
-                    val movie = movieDetailsState.data
-                    if (movie != null) {
-                        MovieDetails(
-                            goToMoviePlayer = goToMoviePlayer,
-                            movieDetails = movie
-                        )
-                    }
+            handleState(movieDetailsState) {
+                movieDetails?.let {
+                    MovieDetails(
+                        goToMoviePlayer = goToMoviePlayer,
+                        movieDetails = it
+                    )
                 }
             }
         }
 
-        // Cast
+        // Cast Section
         item {
-            when (castState) {
-                is MovieState.Loading -> Box {
+            handleState(castState) {
+                CastSection(castList = castList)
+            }
+        }
+
+        // Related / Similar Movies
+        item {
+            handleState(similarMoviesState) {
+                RelatedMoviesSection(movies = similarMovies)
+            }
+        }
+
+        // Reviews (reuses movieDetails)
+        item {
+            if (movieDetailsState is MovieState.Loading) {
+                Box(Modifier.fillMaxWidth()) {
                     TVGradientLoadingIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-
-                is MovieState.Error -> ErrorStrip(castState.message)
-                is MovieState.Success -> {
-                    CastSection(castList = castState.data ?: emptyList())
+            } else if (movieDetailsState is MovieState.Error) {
+                ErrorStrip(movieDetailsState.message)
+            } else {
+                movieDetails?.let {
+                    MovieReviews(
+                        movie = it,
+                        modifier = Modifier.padding(top = childPadding.top)
+                    )
                 }
             }
         }
 
-        // Related / similar movies
-        item {
-            when (similarMoviesState) {
-                is MovieState.Loading -> Box {
-                    TVGradientLoadingIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-
-                is MovieState.Error -> ErrorStrip(similarMoviesState.message)
-                is MovieState.Success -> {
-                    RelatedMoviesSection(movies = similarMoviesState.data?.results ?: emptyList())
-                }
-            }
-        }
-
-        // Example: Reviews static for now
-        item {
-            when (movieDetailsState) {
-                is MovieState.Loading -> Box {
-                    TVGradientLoadingIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-
-                is MovieState.Error -> ErrorStrip(movieDetailsState.message)
-                is MovieState.Success -> {
-                    val movie = movieDetailsState.data
-                    if (movie != null) {
-                        MovieReviews(
-                            movie = movie,
-                            modifier = Modifier.padding(top = childPadding.top),
-                        )
-                    }
-                }
-            }
-
-        }
+        // Divider
         item {
             Box(
                 modifier = Modifier
@@ -180,37 +163,46 @@ private fun Details(
             )
         }
 
+        // Basic Movie Data Section
         item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = childPadding.start),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val itemModifier = Modifier.width(192.dp)
-
-                TitleValueText(
-                    modifier = itemModifier,
-                    title = "kajsbd",
-                    value = "status"
-                )
-                TitleValueText(
-                    modifier = itemModifier,
-                    title = "ksmd",
-                    value = "originalLanguage"
-                )
-                TitleValueText(
-                    modifier = itemModifier,
-                    title = ";lskjdf",
-                    value = "budget"
-                )
-                TitleValueText(
-                    modifier = itemModifier,
-                    title = "lkasf",
-                    value = "revenue"
-                )
+            movieDetails?.let {
+                SetMovieBasicData(it)
             }
         }
+    }
+}
+
+@Composable
+fun SetMovieBasicData(movies: MovieDetailsDTO) {
+    val childPadding = rememberChildPadding()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = childPadding.start),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        val itemModifier = Modifier.width(192.dp)
+
+        TitleValueText(
+            modifier = itemModifier,
+            title = "Status",
+            value = movies.status
+        )
+        TitleValueText(
+            modifier = itemModifier,
+            title = "Original Language",
+            value = movies.originalLanguage.uppercase(Locale.ROOT)
+        )
+        TitleValueText(
+            modifier = itemModifier,
+            title = "Budget",
+            value = formatToMillions(movies.budget).toString()
+        )
+        TitleValueText(
+            modifier = itemModifier,
+            title = "Revenue",
+            value = formatToMillions(movies.revenue).toString()
+        )
     }
 }
 
@@ -284,8 +276,8 @@ fun ClassicMovieCard(
     ClassicCard(
         onClick = { onClick() },
         modifier = Modifier
-            .width(150.dp)
-            .height(250.dp),
+            .width(160.dp)
+            .height(290.dp),
         image = {
             Image(
                 painter = rememberAsyncImagePainter(model = imageUrl),
@@ -293,13 +285,14 @@ fun ClassicMovieCard(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight()
+                    .height(230.dp)
                     .aspectRatio(CardDefaults.VerticalImageAspectRatio),
             )
         },
         title = {
             Text(
                 text = title,
+                maxLines = 1,
                 modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)
             )
         },
@@ -360,6 +353,22 @@ fun AvatarIcon(modifier: Modifier, avatarRes: String, description: String? = nul
         modifier = modifier
             .clip(CircleShape),
     )
+}
+// Centralized error/loading handling (optional for cleaner layout)
+@Composable
+fun <T> handleState(
+    state: MovieState<T>,
+    onSuccess: @Composable (T) -> Unit
+) {
+    when (state) {
+        is MovieState.Loading -> Box(Modifier.fillMaxWidth()) {
+            TVGradientLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+        is MovieState.Error -> ErrorStrip(state.message)
+        is MovieState.Success -> {
+            state.data?.let { onSuccess(it) }
+        }
+    }
 }
 
 

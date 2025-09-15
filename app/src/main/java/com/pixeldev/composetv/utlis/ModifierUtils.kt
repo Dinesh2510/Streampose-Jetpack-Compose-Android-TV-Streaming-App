@@ -20,9 +20,11 @@ import android.content.Context
 import android.view.KeyEvent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
@@ -246,6 +248,7 @@ fun TitleValueText(
             text = title,
             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),color = Color.White,
         )
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = value,
             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Normal),color = Color.White,
@@ -301,3 +304,16 @@ val tvGenresWithSubtitles = listOf(
     GenreWithSubtitle(10768, "War & Politics", "Power struggles and wartime drama"),
     GenreWithSubtitle(37, "Western", "Cowboys, duels, and dusty trails")
 )
+fun formatToMillions(number: Long): String {
+    return when {
+        number >= 1_000_000 -> {
+            val millions = number / 1_000_000.0
+            String.format("%.1fM", millions).removeSuffix(".0M") + "M"
+        }
+        number >= 1_000 -> {
+            val thousands = number / 1_000.0
+            String.format("%.1fK", thousands).removeSuffix(".0K") + "K"
+        }
+        else -> number.toString()
+    }
+}

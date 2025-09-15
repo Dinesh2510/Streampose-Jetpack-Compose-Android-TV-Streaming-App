@@ -50,16 +50,16 @@ fun MovieReviews(
         ) {
             Review(
                 "Imdb",
-                movie.voteAverage,
-                movie.voteCount,
+                movie.voteAverage?.let { String.format("%.1f", it) } ?: "-",
+                 "${movie.voteCount} reviews",
                 modifier
                     .weight(1f)
                     .height(96.dp)
             )
             Review(
-                "Imdb",
-                movie.voteAverage,
-                movie.voteCount,
+                "IMDb",
+                movie.voteAverage.let { String.format("%.1f", it) },
+                "${movie.voteCount}" ,
                 modifier
                     .weight(1f)
                     .height(96.dp)
@@ -71,8 +71,8 @@ fun MovieReviews(
 @Composable
 private fun Review(
     title: String,
-    voteAvg: Double,
-    voteCount: Long,
+    voteAvg: String,
+    voteCount: String,
     modifier: Modifier = Modifier
 ) {
     Surface(
