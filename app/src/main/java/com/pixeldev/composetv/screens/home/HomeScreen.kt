@@ -23,10 +23,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -49,6 +55,7 @@ import com.pixeldev.composetv.screens.categories.ErrorScreen
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_300
 import com.pixeldev.composetv.utlis.MovieState
 import com.pixeldev.composetv.utlis.TVGradientLoadingIndicator
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavHostController) {
@@ -227,18 +234,31 @@ fun MovieSection(
     movies: ArrayList<Movies>?,
     onClickMovieCard: (movieId: Int) -> Unit
 ) {
-    Column {
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val coroutineScope = rememberCoroutineScope()
+    Column( modifier = Modifier
+        .fillMaxWidth()
+        .bringIntoViewRequester(bringIntoViewRequester) ) {
         SectionHeader(title)
 
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 0.dp), // Or remove this line
-            contentPadding = PaddingValues(start = 24.dp, end = 24.dp), // Control padding here
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp)
         ) {
-            items(movies ?: emptyList()) { movie ->
+            itemsIndexed(movies ?: emptyList()) { index, movie ->
                 TvCardItem(
+                    modifier = Modifier
+                        .onFocusChanged { state ->
+                            // ✅ Only trigger when first card of this row gets focus
+                            if (state.isFocused && index == 0) {
+                                coroutineScope.launch {
+                                    bringIntoViewRequester.bringIntoView()
+                                }
+                            }
+                        },
                     movie
                 ) { movie.id?.toInt()?.let { onClickMovieCard(it) } }
             }
@@ -249,12 +269,13 @@ fun MovieSection(
 
 @Composable
 fun TvCardItem(
+    modifier: Modifier = Modifier,
     movie: Movies,
     onClickPressed: () -> Unit,
 ) {
     CompactCard(
         onClick = { onClickPressed() },
-        modifier = Modifier
+        modifier = modifier
             .width(200.dp),
         image = {
             Image(

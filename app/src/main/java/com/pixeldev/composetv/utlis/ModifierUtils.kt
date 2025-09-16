@@ -267,7 +267,7 @@ fun Context.getDummyMovies(): List<MovieResponse> {
 }
 
 @Composable
-fun SectionHeader(title: String) {
+fun SectionHeader(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
         style =
@@ -276,7 +276,7 @@ fun SectionHeader(title: String) {
                 fontSize = 25.sp
             ),
         color = Color.White,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 12.dp)
     )
 }
 
