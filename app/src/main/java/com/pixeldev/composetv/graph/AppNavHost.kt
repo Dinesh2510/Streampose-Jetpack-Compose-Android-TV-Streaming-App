@@ -156,7 +156,7 @@ fun DashBoardScreen(navController: NavHostController) {
             }
             composable(Screen.FavoritesScreen.route) {
                // PageContent(1)
-                FavouriteScreen()
+                FavouriteScreen(navController)
             }
             composable(Screen.SettingsScreen.route) {
                 SettingScreen()

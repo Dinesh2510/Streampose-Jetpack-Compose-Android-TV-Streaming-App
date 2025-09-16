@@ -1,6 +1,7 @@
 package com.pixeldev.composetv.screens.details
 
 import android.widget.Space
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,10 +22,13 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.OndemandVideo
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -42,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.Icon
@@ -50,14 +55,19 @@ import androidx.tv.material3.ShapeDefaults
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.pixeldev.composetv.data.local.WatchListModel
 import com.pixeldev.composetv.data.remote.response.MovieDetailsDTO
 import com.pixeldev.composetv.models.Genre
+import com.pixeldev.composetv.screens.favourite.WatchListViewModel
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_1280
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_300
+import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_780
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_POSTER_IMAGE_URL
 import com.pixeldev.composetv.utlis.TitleValueText
 import com.pixeldev.composetv.utlis.rememberChildPadding
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -65,9 +75,31 @@ fun MovieDetails(
     goToMoviePlayer: () -> Unit,
     movieDetails: MovieDetailsDTO
 ) {
-    val childPadding = rememberChildPadding()
-    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+
+    /** Below code for Room Database Add to Fav*/
+    val watchListViewModel: WatchListViewModel = hiltViewModel()
+    val exist by watchListViewModel.exist   // 👈 observe state
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val childPadding = rememberChildPadding()
+
+    // ✅ Only call once when screen is opened
+    LaunchedEffect(movieDetails.id) {
+        watchListViewModel.exist(movieDetails.id)
+    }
+
+    val date = SimpleDateFormat.getDateInstance().format(Date())
+    val myListMovie = WatchListModel(
+        mediaId = movieDetails.id,
+        imagePosterPath = BASE_POSTER_IMAGE_URL +movieDetails.posterPath,
+        title = movieDetails.title,
+        releaseDate = movieDetails.releaseDate,
+        rating = movieDetails.voteAverage,
+        addedOn = date,
+        imageBackDropPath = BASE_BACKDROP_IMAGE_URL_780 +movieDetails.backdropPath,
+        description = movieDetails.overview?:"",
+    )
 
     Box(
         modifier = Modifier
@@ -115,13 +147,13 @@ fun MovieDetails(
                         modifier = Modifier.padding(top = 20.dp),
                         texts = movieDetails.genres
                     )
-                    DirectorScreenplayMusicRow(
+                   /* DirectorScreenplayMusicRow(
                         director = "director",
                         screenplay = "screenplay",
                         music = "music"
-                    )
+                    )*/
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     WatchTrailerButton(
                         title = "Watch Now",
                         imageVector = Icons.Outlined.PlayArrow,
@@ -130,7 +162,7 @@ fun MovieDetails(
                                 coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
                             }
                         },
-                        goToMoviePlayer = goToMoviePlayer
+                        onClickButton = goToMoviePlayer
                     )
 
                     WatchTrailerButton(
@@ -141,18 +173,27 @@ fun MovieDetails(
                                 coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
                             }
                         },
-                        goToMoviePlayer = goToMoviePlayer
+                        onClickButton = goToMoviePlayer
                     )
 
+
                     WatchTrailerButton(
-                        title = "Add to favourite",
-                        imageVector = Icons.Outlined.FavoriteBorder,
+                        title = if (exist == 0) "Favourite" else "Remove",
                         modifier = Modifier.onFocusChanged {
                             if (it.isFocused) {
                                 coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
                             }
                         },
-                        goToMoviePlayer = goToMoviePlayer
+                        imageVector = if (exist == 0) Icons.Outlined.FavoriteBorder else Icons.Outlined.Favorite,
+                        onClickButton = {
+                            if (exist == 0) {
+                                watchListViewModel.addToWatchList(myListMovie)
+                                Toast.makeText(context, "Added to Favourite", Toast.LENGTH_SHORT).show()
+                            } else {
+                                watchListViewModel.removeFromWatchList(movieDetails.id)
+                                Toast.makeText(context, "Removed from Favourite", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     )
                 }
             }
@@ -163,12 +204,12 @@ fun MovieDetails(
 @Composable
 private fun WatchTrailerButton(
     modifier: Modifier = Modifier,
-    goToMoviePlayer: () -> Unit,
+    onClickButton: () -> Unit,
     title: String,
     imageVector: ImageVector
 ) {
     Button(
-        onClick = goToMoviePlayer,
+        onClick = { onClickButton() },
         modifier = modifier.padding(top = 24.dp),
         contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
         shape = ButtonDefaults.shape(shape = ShapeDefaults.ExtraSmall)

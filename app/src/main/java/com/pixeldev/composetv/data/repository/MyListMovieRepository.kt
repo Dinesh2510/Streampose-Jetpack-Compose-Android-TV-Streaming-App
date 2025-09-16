@@ -1,7 +1,9 @@
 package com.pixeldev.composetv.data.repository
 
-
-/*
+import com.pixeldev.composetv.data.local.MovieDao
+import com.pixeldev.composetv.data.local.WatchListModel
+import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 class MyListMovieRepository @Inject constructor(private val movieDao: MovieDao) {
     suspend fun insertMovieInList(myListMovie: WatchListModel) {
@@ -23,4 +25,4 @@ class MyListMovieRepository @Inject constructor(private val movieDao: MovieDao) 
     fun getAllData(): Flow<List<WatchListModel>> {
         return movieDao.getAllWatchListData()
     }
-}*/
+}
