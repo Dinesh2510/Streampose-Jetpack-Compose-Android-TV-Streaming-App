@@ -39,16 +39,24 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.pixeldev.composetv.R
 import com.pixeldev.composetv.data.remote.response.MovieResponse
 import com.pixeldev.composetv.models.Genre
 
@@ -316,4 +324,36 @@ fun formatToMillions(number: Long): String {
         }
         else -> number.toString()
     }
+}
+
+@Composable
+fun CommonImage(
+    imageUrl: String,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Crop,
+    placeholderRes: Int? = R.drawable.logo_trans,  // Optional placeholder resource
+    errorRes: Int? = R.drawable.error         // Optional error resource
+) {
+    // Coil Image Painter
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current)
+            .data(imageUrl)
+            .crossfade(true) // Optional: Adds fade effect on loading
+            .apply {
+                placeholderRes?.let { placeholder(it) }
+                errorRes?.let { error(it) }
+            }
+            .build()
+    )
+
+    // Using AsyncImage with appropriate placeholders
+    AsyncImage(
+        model = imageUrl,
+        contentDescription = contentDescription,
+        modifier = modifier,
+        contentScale = contentScale,
+        placeholder = painter, // Default to 0 if null
+        error =painter // Default to 0 if null
+    )
 }

@@ -1,6 +1,7 @@
 package com.pixeldev.composetv.screens.search
 
 import android.view.KeyEvent
+import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -46,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -68,6 +70,7 @@ import com.pixeldev.composetv.models.Search
 import com.pixeldev.composetv.screens.favourite.Movie
 import com.pixeldev.composetv.screens.favourite.NetflixPosterCard
 import com.pixeldev.composetv.screens.home.JetStreamCardShape
+import com.pixeldev.composetv.utlis.CommonImage
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_POSTER_IMAGE_URL
 import com.pixeldev.composetv.utlis.TVGradientLoadingIndicator
 
@@ -102,7 +105,8 @@ fun SearchResult(
     val tfInteractionSource = remember { MutableInteractionSource() }
     val isTfFocused by tfInteractionSource.collectIsFocusedAsState()
     var submittedQuery by remember { mutableStateOf("") } // ✅ Track submitted query
-
+    var context = LocalContext.current
+    LaunchedEffect(Unit) { tfFocusRequester.requestFocus() }
     Column(modifier = modifier.fillMaxSize()) {
         // 🔍 Search Box
         Surface(
@@ -124,7 +128,23 @@ fun SearchResult(
                     color = if (isTfFocused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.border,
                     shape = JetStreamCardShape
                 )
-                .focusable(true),
+                .focusable(true)
+                .onKeyEvent() {
+                    if (it.nativeKeyEvent.action == KeyEvent.ACTION_UP) {
+                        when (it.nativeKeyEvent.keyCode) {
+                            KeyEvent.KEYCODE_DPAD_UP -> {
+                                // focusManager.moveFocus(FocusDirection.Up)
+                                tfFocusRequester.requestFocus()
+                                Toast.makeText(context, "Up...", Toast.LENGTH_SHORT).show()
+                            }
+
+                            KeyEvent.KEYCODE_DPAD_DOWN -> focusManager.moveFocus(FocusDirection.Down)
+                            KeyEvent.KEYCODE_BACK -> focusManager.clearFocus()
+                        }
+                    }
+                    true
+
+                },
             onClick = { tfFocusRequester.requestFocus() }
         ) {
             BasicTextField(
@@ -152,6 +172,12 @@ fun SearchResult(
                     .onKeyEvent {
                         if (it.nativeKeyEvent.action == KeyEvent.ACTION_UP) {
                             when (it.nativeKeyEvent.keyCode) {
+                                KeyEvent.KEYCODE_DPAD_UP -> {
+                                    /* focusManager.moveFocus(FocusDirection.Up)
+                                     tfFocusRequester.requestFocus()*/
+                                    Toast.makeText(context, "up text...", Toast.LENGTH_SHORT).show()
+                                }
+
                                 KeyEvent.KEYCODE_DPAD_DOWN -> focusManager.moveFocus(FocusDirection.Down)
                                 KeyEvent.KEYCODE_BACK -> focusManager.clearFocus()
                                 KeyEvent.KEYCODE_DPAD_CENTER, // ✅ Remote OK/Enter
@@ -227,8 +253,6 @@ fun SearchResult(
 }
 
 
-
-
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun PosterCard(
@@ -267,11 +291,12 @@ fun PosterCard(
             )
         )
     ) {
-        AsyncImage(
-            model = BASE_POSTER_IMAGE_URL +movie.posterPath,
+        CommonImage(
+            imageUrl = BASE_POSTER_IMAGE_URL + movie.posterPath,
             contentDescription = movie.title,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
     }
 }
