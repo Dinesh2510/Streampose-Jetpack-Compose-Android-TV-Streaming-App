@@ -5,6 +5,7 @@
     <string name="delete_account_dialog_text">"By deactivating your account, you will no longer be able to sign in, your activity will be removed from JetStream and your profile preferences will go away.\n\nDo you wish to continue?\n"</string>
     <string name="yes_delete_account">Yes, delete my account</string>
     <string name="no_keep_it">No, keep it</string>
+    <string name="search_hint">Your next favorite show is waiting… after you find it!</string>
     <!--Streampose
 
 Stream + Compose

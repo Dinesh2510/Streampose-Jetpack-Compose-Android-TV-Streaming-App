@@ -7,35 +7,42 @@ import com.pixeldev.composetv.models.Search
 import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import java.io.IOException
+import kotlin.collections.filterNotNull
 
 class SearchFilmSource(
     private val api: ApiService,
     private val searchParams: String,
     private val includeAdult: Boolean
 ) : PagingSource<Int, Search>() {
-    override fun getRefreshKey(state: PagingState<Int, Search>): Int? = state.anchorPosition
-var error = 0
+
+    override fun getRefreshKey(state: PagingState<Int, Search>): Int? =
+        state.anchorPosition
+
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Search> {
         return try {
             val nextPage = params.key ?: 1
-            delay(3000L)
-            /*error++
-            if (error ==3)
-                throw IOException("My Custom error here")*/
+            delay(3000L) // optional, just simulating slow network
+
             val searchMovies = api.multiSearch(
                 page = nextPage,
                 searchParams = searchParams,
                 includeAdult = includeAdult
             )
+
+            // Clean results: convert nullable list into non-nullable list
+            val movies: List<Search> = (searchMovies.results
+                .filterNotNull()     // remove nulls inside list
+                    )        // handle null list
+
             LoadResult.Page(
-                data = searchMovies.results,
+                data = movies,
                 prevKey = if (nextPage == 1) null else nextPage - 1,
-                nextKey = if (searchMovies.results.isEmpty()) null else searchMovies.page + 1
+                nextKey = if (movies.isEmpty()) null else (searchMovies.page ?: nextPage) + 1
             )
         } catch (e: IOException) {
-            return LoadResult.Error(e)
+            LoadResult.Error(e)
         } catch (e: HttpException) {
-            return LoadResult.Error(e)
+            LoadResult.Error(e)
         }
     }
 }

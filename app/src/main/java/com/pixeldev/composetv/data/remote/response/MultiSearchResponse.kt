@@ -6,13 +6,13 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class MultiSearchResponse(
+data class MultiSearchResponse(
     @SerialName("page")
-    val page: Int,
+    val page: Int?,
     @SerialName("results")
-    val results: List<Search>,
+    val results: List<Search?>,
     @SerialName("total_pages")
-    val totalPages: Int,
+    val totalPages: Int?,
     @SerialName("total_results")
-    val totalResults: Int
+    val totalResults: Int?
 )
