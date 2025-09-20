@@ -333,7 +333,7 @@ fun CommonImage(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     placeholderRes: Int? = R.drawable.logo_trans,  // Optional placeholder resource
-    errorRes: Int? = R.drawable.error         // Optional error resource
+    errorRes: Int? = R.drawable.custom_image_with_padding         // Optional error resource
 ) {
     // Coil Image Painter
     val painter = rememberAsyncImagePainter(

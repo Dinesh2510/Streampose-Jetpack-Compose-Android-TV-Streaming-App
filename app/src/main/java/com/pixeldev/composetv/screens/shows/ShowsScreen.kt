@@ -39,6 +39,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.pixeldev.composetv.data.remote.response.GenreResponse
 import com.pixeldev.composetv.data.remote.response.MovieResponse
+import com.pixeldev.composetv.graph.Screen
 import com.pixeldev.composetv.models.Genre
 import com.pixeldev.composetv.models.Movies
 import com.pixeldev.composetv.screens.home.GenreItem
@@ -125,7 +126,10 @@ fun AllShowsScreen(
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 items(data.results) { showInt ->
-                                    TVShowCardContainerUI(showInt)
+                                    // TODO: Shows Details Page API
+                                    TVShowCardContainerUI(showInt){
+                                        navHostController.navigate(Screen.MovieDetails.route + "/${it}")
+                                    }
                                 }
                             }
                         }
@@ -229,14 +233,14 @@ fun Genre.toWithSubtitle(): GenreWithSubtitle {
 }
 
 @Composable
-fun TVShowCardContainerUI(data: Movies) {
+fun TVShowCardContainerUI(data: Movies,onClickMovieCard: (movieId: Int) -> Unit) {
     StandardCardContainer(
         modifier = Modifier
             .width(200.dp)
             .padding(horizontal = 4.dp),
         imageCard = {
             Card(
-                onClick = { },
+                onClick = { onClickMovieCard(data.id!!)},
                 interactionSource = it,
                 colors = CardDefaults.colors(containerColor = Color.Transparent)
             ) {

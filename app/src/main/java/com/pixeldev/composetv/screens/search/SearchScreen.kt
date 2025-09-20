@@ -53,6 +53,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -66,6 +67,7 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
 import com.pixeldev.composetv.R
+import com.pixeldev.composetv.graph.Screen
 import com.pixeldev.composetv.models.Search
 import com.pixeldev.composetv.screens.favourite.Movie
 import com.pixeldev.composetv.screens.favourite.NetflixPosterCard
@@ -77,7 +79,7 @@ import com.pixeldev.composetv.utlis.TVGradientLoadingIndicator
 
 @Composable
 fun SearchScreen(
-    onMovieClick: (movie: Search) -> Unit,
+    navHostController: NavHostController,
     searchScreenViewModel: SearchScreenViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel(),
 ) {
@@ -91,7 +93,9 @@ fun SearchScreen(
             searchScreenViewModel.query(it)
             userViewModel.addSearchTerm(it)
         },
-        onMovieClick = onMovieClick,
+        onMovieClick = {
+            navHostController.navigate(Screen.MovieDetails.route + "/${it.id}")
+        },
         modifier = Modifier.fillMaxSize()
     )
 }
@@ -140,7 +144,7 @@ fun SearchResult(
                             KeyEvent.KEYCODE_DPAD_UP -> {
                                 // focusManager.moveFocus(FocusDirection.Up)
                                 tfFocusRequester.requestFocus()
-                                Toast.makeText(context, "Up...", Toast.LENGTH_SHORT).show()
+                              //  Toast.makeText(context, "Up...", Toast.LENGTH_SHORT).show()
                             }
 
                             KeyEvent.KEYCODE_DPAD_DOWN -> focusManager.moveFocus(FocusDirection.Down)
@@ -180,7 +184,7 @@ fun SearchResult(
                                 KeyEvent.KEYCODE_DPAD_UP -> {
                                     /* focusManager.moveFocus(FocusDirection.Up)
                                      tfFocusRequester.requestFocus()*/
-                                    Toast.makeText(context, "up text...", Toast.LENGTH_SHORT).show()
+                                    //Toast.makeText(context, "up text...", Toast.LENGTH_SHORT).show()
                                 }
 
                                 KeyEvent.KEYCODE_DPAD_DOWN -> focusManager.moveFocus(FocusDirection.Down)

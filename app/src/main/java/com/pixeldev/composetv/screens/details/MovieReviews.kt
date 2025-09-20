@@ -57,9 +57,9 @@ fun MovieReviews(
                     .height(96.dp)
             )
             Review(
-                "IMDb",
-                movie.voteAverage.let { String.format("%.1f", it) },
-                "${movie.voteCount}" ,
+                "Director",
+                "",
+                "" ,
                 modifier
                     .weight(1f)
                     .height(96.dp)

@@ -81,6 +81,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             val movieId = backStackEntry.arguments?.getString(Movie_Details_ID) ?: return@composable
 
             MovieDetailsScreen(
+                navController,
                 movieId = movieId,
                 onBackPressed = { navController.popBackStack() },
             )
@@ -159,9 +160,7 @@ var conext = LocalContext.current
                 HomeScreen(navController = navController) // parent navController for app-level navigation
             }
             composable(Screen.SearchScreen.route) {
-                SearchScreen(
-                    onMovieClick = {},
-                )
+                SearchScreen(navController)
               //  TvCategoriesScreen()
                // TvScreenContent("ProfileScreen")
             }

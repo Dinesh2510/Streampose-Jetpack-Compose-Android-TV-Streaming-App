@@ -222,3 +222,15 @@ data class Movie(
     val posterUrl: String,
     val backdropUrl: String
 )
+/*
+* var jndfn= LocalContext.current
+    NetflixImmersiveScreen("", loadMoviesFromAssets(jndfn),{})
+}
+fun loadMoviesFromAssets(context: Context): List<Movie> {
+    val json = context.assets.open("movies.json")
+        .bufferedReader()
+        .use { it.readText() }
+
+    return Json { ignoreUnknownKeys = true }
+        .decodeFromString(json)
+}*/

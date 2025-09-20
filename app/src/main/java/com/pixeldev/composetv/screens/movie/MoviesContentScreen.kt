@@ -199,8 +199,9 @@ fun SetMovieData(
                     items(upcomingMovie!!.results.size) { movieIndex ->
                         val movie = upcomingMovie!!.results[movieIndex]
                         // MovieCard for each movie
-                        MovieCard(movie = movie) {
-                            focusedMovie.value = movie
+                        MovieCard(movie = movie, onFocus = { focusedMovie.value = movie}) {
+                            navController.navigate(Screen.MovieDetails.route + "/${it}")
+
                         }
                     }
                 }
@@ -211,8 +212,8 @@ fun SetMovieData(
             MovieSection(
                 title = "Discovery Movies",
                 movies = discoveryMovie?.results,
-                onClickMovieCard = {
-                    navController.navigate(Screen.MovieDetails.route)
+                onClickMovieCard = {movieId ->
+                    navController.navigate(Screen.MovieDetails.route + "/${movieId}")
                 })
         }
 
@@ -220,7 +221,8 @@ fun SetMovieData(
             MovieSection(
                 title = "Trending Movies",
                 movies = trendingMovie?.results,
-                onClickMovieCard = { navController.navigate(Screen.MovieDetails.route) }
+                onClickMovieCard = { movieId ->
+                    navController.navigate(Screen.MovieDetails.route + "/${movieId}") }
             )
         }
 
@@ -228,7 +230,8 @@ fun SetMovieData(
             MovieSection(
                 title = "Now Playing Movies",
                 movies = nowPlayingMovie?.results,
-                onClickMovieCard = { navController.navigate(Screen.MovieDetails.route) }
+                onClickMovieCard = {movieId ->
+                    navController.navigate(Screen.MovieDetails.route + "/${movieId}") }
             )
         }
 
@@ -241,7 +244,10 @@ fun SetMovieData(
 
         item {
             Column(Modifier.padding(8.dp)) {
-                GenreSection(genres = genresMovie?.genres)
+                GenreSection(genres = genresMovie?.genres,
+                    onClickCard = {
+                        navController.navigate(Screen.CategoryDetailsScreen.route)
+                    })
             }
         }
 
@@ -470,7 +476,9 @@ fun TopHeroSection(movie: Movies?) {
 @Composable
 fun MovieCard(
     movie: Movies,
-    onFocus: () -> Unit
+    onFocus: () -> Unit,
+    onClickMovieCard: (movieId: Int) -> Unit
+
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
@@ -487,7 +495,7 @@ fun MovieCard(
                 isFocused = it.isFocused
                 if (it.isFocused) onFocus()
             }
-            .focusable(), onClick = {}
+            .focusable(), onClick = {onClickMovieCard(movie.id?:0)}
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)

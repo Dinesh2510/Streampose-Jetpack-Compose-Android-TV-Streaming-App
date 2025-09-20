@@ -56,6 +56,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.Carousel
@@ -68,6 +69,7 @@ import androidx.tv.material3.ShapeDefaults
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
 import com.pixeldev.composetv.data.remote.response.MovieResponse
+import com.pixeldev.composetv.graph.Screen
 import com.pixeldev.composetv.models.Movies
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_780
 
@@ -81,6 +83,7 @@ val CarouselSaver = Saver<CarouselState, Int>(
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun FeaturedMoviesCarousel(
+    navHostController: NavHostController,
     discoveryMovie: MovieResponse?,
     modifier: Modifier = Modifier
 ) {
@@ -124,11 +127,12 @@ fun FeaturedMoviesCarousel(
         contentTransformEndToStart = fadeIn(tween(durationMillis = 1000))
             .togetherWith(fadeOut(tween(durationMillis = 1000))),
         content = { index ->
-             val movie = movieResponse[index]
+            val movie = movieResponse[index]
             // background
             CarouselItemBackground(modifier = Modifier.fillMaxSize(), movie)
             // foreground
             CarouselItemForeground(
+                navHostController,
                 movie,
                 isCarouselFocused = isCarouselFocused,
                 modifier = Modifier.fillMaxSize()
@@ -166,6 +170,7 @@ private fun BoxScope.CarouselIndicator(
 
 @Composable
 private fun CarouselItemForeground(
+    navHostController: NavHostController,
     movie: Movies,
     modifier: Modifier = Modifier,
     isCarouselFocused: Boolean = false
@@ -211,7 +216,9 @@ private fun CarouselItemForeground(
             AnimatedVisibility(
                 visible = isCarouselFocused,
                 content = {
-                    WatchNowButton()
+                    WatchNowButton(onClickMovieCard = {
+                        navHostController.navigate(Screen.MovieDetails.route + "/${movie.id}")
+                    })
                 }
             )
         }
@@ -240,9 +247,9 @@ private fun CarouselItemBackground(modifier: Modifier = Modifier, movie: Movies)
 }
 
 @Composable
-private fun WatchNowButton() {
+private fun WatchNowButton(onClickMovieCard: () -> Unit) {
     Button(
-        onClick = {},
+        onClick = { onClickMovieCard() },
         modifier = Modifier.padding(top = 8.dp),
         contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
         shape = ButtonDefaults.shape(shape = CircleShape),

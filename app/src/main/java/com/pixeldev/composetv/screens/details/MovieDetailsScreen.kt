@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,13 +44,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.toUpperCase
+import androidx.navigation.NavHostController
 import androidx.tv.material3.Border
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ClassicCard
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.Surface
 import coil.compose.rememberAsyncImagePainter
+import com.pixeldev.composetv.graph.Screen
 import com.pixeldev.composetv.utlis.SectionHeader
 import com.pixeldev.composetv.utlis.TitleValueText
 import com.pixeldev.composetv.utlis.formatToMillions
@@ -59,6 +59,7 @@ import java.util.Locale
 
 @Composable
 fun MovieDetailsScreen(
+    navHostController: NavHostController,
     movieId: String,
     onBackPressed: () -> Unit,
     viewModel: MovieDetailsViewModel = hiltViewModel(),
@@ -76,6 +77,7 @@ fun MovieDetailsScreen(
     }
 
     SetDetails(
+        navHostController = navHostController,
         goToMoviePlayer = { },
         onBackPressed = onBackPressed,
         movieDetailsState = movieDetailsState,
@@ -89,6 +91,7 @@ fun MovieDetailsScreen(
 
 @Composable
 private fun SetDetails(
+    navHostController: NavHostController,
     goToMoviePlayer: () -> Unit,
     onBackPressed: () -> Unit,
     movieDetailsState: MovieState<MovieDetailsDTO?>,
@@ -128,7 +131,7 @@ private fun SetDetails(
         // Related / Similar Movies
         item {
             handleState(similarMoviesState) {
-                RelatedMoviesSection(movies = similarMovies)
+                RelatedMoviesSection(movies = similarMovies,navHostController)
             }
         }
 
@@ -240,7 +243,7 @@ fun CastSection(castList: List<Cast>) {
 
 
 @Composable
-fun RelatedMoviesSection(movies: List<Movies?>) {
+fun RelatedMoviesSection(movies: List<Movies?>, navHostController: NavHostController) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -258,7 +261,9 @@ fun RelatedMoviesSection(movies: List<Movies?>) {
                     imageUrl = BASE_POSTER_IMAGE_URL + (movies[movie]!!.posterPath ?: ""),
                     year = movies[movie]!!.releaseDate.toString(),
                     rating = movies[movie]!!.voteAverage,
-                    onClick = {},
+                    onClick = {
+                        navHostController.navigate(Screen.MovieDetails.route + "/${movies[movie]!!.id}")
+                    },
                 )
             }
         }

@@ -179,6 +179,7 @@ fun MovieContent(
         item() {
 
             FeaturedMoviesCarousel(
+                navController,
                 discoveryMovie,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -231,7 +232,10 @@ fun MovieContent(
         }
 
         item {
-            GenreSection(genres = genresMovie?.genres)
+            GenreSection(genres = genresMovie?.genres,
+                onClickCard = {
+                    navController.navigate(Screen.CategoryDetailsScreen.route)
+                })
         }
 
     }
@@ -360,7 +364,7 @@ fun TvCardItem(
 }
 
 @Composable
-fun GenreSection(genres: List<Genre>?) {
+fun GenreSection(genres: List<Genre>?,onClickCard: () -> Unit) {
     Column {
         SectionHeader("Genres")
 
@@ -375,7 +379,7 @@ fun GenreSection(genres: List<Genre>?) {
                 GenreItem(
                     genre = genre,
                     modifier = Modifier,
-                    onClick = { }
+                    onClick = { onClickCard()}
                 )
             }
         }
