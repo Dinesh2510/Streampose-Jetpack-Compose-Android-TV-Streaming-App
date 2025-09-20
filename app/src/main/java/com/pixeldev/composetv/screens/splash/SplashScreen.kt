@@ -11,36 +11,49 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.pixeldev.composetv.R
 import com.pixeldev.composetv.graph.Screen
+import com.pixeldev.composetv.screens.login.UserViewModel
 import com.pixeldev.composetv.utlis.Constants.Companion.StreamposeBackground
 
 import kotlinx.coroutines.delay
 
-
 @Composable
 fun SplashScreen(
-    navController: NavController // if you want to navigate after splash
+    navController: NavController, // Navigation controller for navigation
+    userViewModel: UserViewModel= hiltViewModel() // Injected ViewModel to check user details
 ) {
-    // Animation state
-    var scale by remember { mutableFloatStateOf(0f) }
-
-    // Navigate after checking saved login
+    // Check user login status on composition
     LaunchedEffect(Unit) {
-        delay(1500) // Optional splash delay for smoother transition
-        navController.navigate(Screen.DashBoardScreen.route) {
-            popUpTo(Screen.Splash.route) { inclusive = true }
+        userViewModel.userDetails.collect { userDetails ->
+            val isLoggedIn = !userDetails.email.isNullOrBlank()
+
+            delay(1500) // Optional splash delay for smoother transition
+
+            if (isLoggedIn) {
+                // ✅ User has a valid email, go to dashboard
+                navController.navigate(Screen.DashBoardScreen.route) {
+                    popUpTo(Screen.Splash.route) { inclusive = true }
+                }
+            } else {
+                // ❌ Email is empty/null, go to login
+                navController.navigate(Screen.LoginScreen.route) {
+                    popUpTo(Screen.Splash.route) { inclusive = true }
+                }
+            }
         }
     }
+
 
     // UI
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = StreamposeBackground), // 🔥 gradient bg
+            .background(brush = StreamposeBackground), // Gradient background
         contentAlignment = Alignment.Center
     ) {
         // Logo with scale animation

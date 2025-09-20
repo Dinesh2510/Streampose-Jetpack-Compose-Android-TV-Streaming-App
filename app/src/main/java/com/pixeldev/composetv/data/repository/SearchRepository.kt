@@ -1,4 +1,4 @@
-package com.pixeldev.composetv.screens.search
+package com.pixeldev.composetv.data.repository
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig

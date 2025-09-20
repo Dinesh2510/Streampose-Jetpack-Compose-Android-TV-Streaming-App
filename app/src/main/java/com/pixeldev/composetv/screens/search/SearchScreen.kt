@@ -70,6 +70,7 @@ import com.pixeldev.composetv.models.Search
 import com.pixeldev.composetv.screens.favourite.Movie
 import com.pixeldev.composetv.screens.favourite.NetflixPosterCard
 import com.pixeldev.composetv.screens.home.JetStreamCardShape
+import com.pixeldev.composetv.screens.login.UserViewModel
 import com.pixeldev.composetv.utlis.CommonImage
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_POSTER_IMAGE_URL
 import com.pixeldev.composetv.utlis.TVGradientLoadingIndicator
@@ -78,6 +79,7 @@ import com.pixeldev.composetv.utlis.TVGradientLoadingIndicator
 fun SearchScreen(
     onMovieClick: (movie: Search) -> Unit,
     searchScreenViewModel: SearchScreenViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel(),
 ) {
 
     val moviesFlow = searchScreenViewModel.multiSearchState.value
@@ -85,7 +87,10 @@ fun SearchScreen(
 
     SearchResult(
         lazyPagingItems = lazyPagingItems,
-        searchMovies = searchScreenViewModel::query,
+        searchMovies = {
+            searchScreenViewModel.query(it)
+            userViewModel.addSearchTerm(it)
+        },
         onMovieClick = onMovieClick,
         modifier = Modifier.fillMaxSize()
     )

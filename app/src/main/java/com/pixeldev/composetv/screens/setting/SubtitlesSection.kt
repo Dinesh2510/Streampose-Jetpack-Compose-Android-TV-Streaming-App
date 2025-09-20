@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemDefaults
@@ -39,7 +40,7 @@ fun SubtitlesSection(
         Column(modifier = Modifier.padding(horizontal = 72.dp)) {
             Text(
                 text = SubtitlesSectionTitle,
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,color = Color.White
             )
             ListItem(
                 modifier = Modifier.padding(top = 16.dp),

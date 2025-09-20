@@ -1,82 +1,10 @@
-package com.pixeldev.composetv.screens.setting
-
-import androidx.annotation.FloatRange
-import androidx.compose.foundation.focusGroup
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import androidx.tv.material3.Icon
-import androidx.tv.material3.ListItem
-import androidx.tv.material3.ListItemDefaults
-import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Text
-import com.pixeldev.composetv.utlis.rememberChildPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Subtitles
-import androidx.compose.material.icons.filled.Support
-import androidx.compose.material.icons.filled.Translate
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.NavHostController
-import com.pixeldev.composetv.R
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
-
+/*
 @Serializable
 data class SettingsTab(
     val route: String,
     @Contextual val icon: ImageVector,
     val title: String
 )
-object Routes {
-    const val ACCOUNTS = "accounts"
-    const val ABOUT = "about"
-    const val SUBTITLES = "subtitles"
-    const val LANGUAGE = "language"
-    const val SEARCH_HISTORY = "search_history"
-    const val HELP_AND_SUPPORT = "help_and_support"
-}
-
 // List of settings tabs
 val settingsTabs = listOf(
     SettingsTab(route = "accounts", icon = Icons.Default.Person, title = "Accounts"),
@@ -84,16 +12,11 @@ val settingsTabs = listOf(
     SettingsTab(route = "subtitles", icon = Icons.Default.Subtitles, title = "Subtitles"),
     SettingsTab(route = "language", icon = Icons.Default.Translate, title = "Language"),
     SettingsTab(route = "search_history", icon = Icons.Default.Search, title = "Search History"),
-    SettingsTab(
-        route = "help_and_support",
-        icon = Icons.Default.Support,
-        title = "Help and Support"
-    )
+    SettingsTab(route = "help_and_support", icon = Icons.Default.Support, title = "Help and Support")
 )
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SettingScreen(
-    navHostController: NavHostController,
     @FloatRange(from = 0.0, to = 1.0)
     sidebarWidthFraction: Float = 0.32f
 ) {
@@ -101,8 +24,7 @@ fun SettingScreen(
     val profileNavController = rememberNavController()
 
     val backStack by profileNavController.currentBackStackEntryAsState()
-    val currentDestination =
-        remember(backStack?.destination?.route) { backStack?.destination?.route }
+    val currentDestination = remember(backStack?.destination?.route) { backStack?.destination?.route }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     var isLeftColumnFocused by remember { mutableStateOf(false) }
@@ -151,16 +73,15 @@ fun SettingScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
                         },
-                        selected = currentDestination == profileScreen.route,
+                        selected = currentDestination == profileScreen.route, // Use `route`
                         onClick = {
                             focusManager.moveFocus(FocusDirection.Right)
-                            // Profile navigation now uses Routes constants
-                            /*profileNavController.navigate(profileScreen.route) {
+                            profileNavController.navigate(profileScreen.route) { // Use `profileScreen.route`
                                 currentDestination?.let { nnCurrentDestination ->
                                     popUpTo(nnCurrentDestination) { inclusive = true }
                                 }
                                 launchSingleTop = true
-                            }*/
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -170,7 +91,7 @@ fun SettingScreen(
                             )
                             .onFocusChanged {
                                 if (it.isFocused && currentDestination != profileScreen.route) {
-                                    profileNavController.navigate(profileScreen.route) { // Use Routes constants
+                                    profileNavController.navigate(profileScreen.route) { // Use `profileScreen.route`
                                         currentDestination?.let { nnCurrentDestination ->
                                             popUpTo(nnCurrentDestination) { inclusive = true }
                                         }
@@ -208,25 +129,36 @@ fun SettingScreen(
                     false
                 },
             navController = profileNavController,
-            startDestination = Routes.ACCOUNTS,  // Now using Routes constant
+            startDestination = "accounts",  // Correct start destination
             builder = {
-                composable(Routes.ACCOUNTS) { AccountsSection(navHostController) }
-                composable(Routes.ABOUT) { AboutSection() }
-                composable(Routes.SUBTITLES) {
+                composable("accounts") { AccountsSection() }
+                composable("about") { AboutSection() }
+                composable("subtitles") {
                     SubtitlesSection(
                         isSubtitlesChecked = isSubtitlesChecked,
                         onSubtitleCheckChange = { isSubtitlesChecked = it }
                     )
                 }
-                composable(Routes.LANGUAGE) {
+                composable("language") {
                     LanguageSection(
                         selectedIndex = selectedLanguageIndex,
                         onSelectedIndexChange = { selectedLanguageIndex = it }
                     )
                 }
-                composable(Routes.SEARCH_HISTORY) { SearchHistorySection() }
-                composable(Routes.HELP_AND_SUPPORT) { HelpAndSupportSection() }
+                composable("search_history") { SearchHistorySection() }
+                composable("help_and_support") { HelpAndSupportSection() }
             }
         )
     }
 }
+
+@Preview(device = Devices.TV_1080p)
+@Composable
+fun ProfileScreenPreview() {
+  /*  JetStreamTheme {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
+            ProfileScreen()
+        }
+    }*/
+}
+*/

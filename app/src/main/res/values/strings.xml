@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Streamose</string>
+    <string name="app_name">Streampose</string>
     <string name="trending">Trending</string>
     <string name="delete_account_dialog_title">Delete account?</string>
     <string name="delete_account_dialog_text">"By deactivating your account, you will no longer be able to sign in, your activity will be removed from JetStream and your profile preferences will go away.\n\nDo you wish to continue?\n"</string>

@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -44,7 +45,8 @@ fun AboutSection() {
         Column(modifier = Modifier.padding(horizontal = 72.dp)) {
             Text(
                 text = AboutSectionTitle,
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.White
             )
             Text(
                 modifier = Modifier

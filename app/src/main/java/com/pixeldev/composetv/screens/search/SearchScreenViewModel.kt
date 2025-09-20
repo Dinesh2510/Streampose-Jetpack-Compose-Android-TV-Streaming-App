@@ -23,15 +23,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.filter
+import com.pixeldev.composetv.data.repository.SearchRepository
 import com.pixeldev.composetv.models.Search
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 @HiltViewModel
 class SearchScreenViewModel @Inject constructor(
@@ -46,13 +44,13 @@ class SearchScreenViewModel @Inject constructor(
 
     init {
         // Default search
-        searchParam.value = ""
-        searchRemoteMovie(includeAdult = true)
+       /* searchParam.value = ""
+        searchRemoteMovie(includeAdult = true)*/
     }
 
     fun query(queryString: String) {
         searchParam.value = queryString
-        searchRemoteMovie(includeAdult = true)
+        searchRemoteMovie(includeAdult = false)
     }
 
     private fun searchRemoteMovie(includeAdult: Boolean) {
