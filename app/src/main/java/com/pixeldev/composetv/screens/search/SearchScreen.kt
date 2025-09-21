@@ -1,7 +1,6 @@
 package com.pixeldev.composetv.screens.search
 
 import android.view.KeyEvent
-import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -20,19 +19,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,15 +59,12 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
-import coil.compose.AsyncImage
 import com.pixeldev.composetv.R
 import com.pixeldev.composetv.graph.Screen
 import com.pixeldev.composetv.models.Search
-import com.pixeldev.composetv.screens.favourite.Movie
-import com.pixeldev.composetv.screens.favourite.NetflixPosterCard
 import com.pixeldev.composetv.screens.home.JetStreamCardShape
 import com.pixeldev.composetv.screens.login.UserViewModel
-import com.pixeldev.composetv.utlis.CommonImage
+import com.pixeldev.composetv.utlis.CommonImageLoader
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_POSTER_IMAGE_URL
 import com.pixeldev.composetv.utlis.TVGradientLoadingIndicator
 
@@ -300,7 +291,7 @@ fun PosterCard(
             )
         )
     ) {
-        CommonImage(
+        CommonImageLoader(
             imageUrl = BASE_POSTER_IMAGE_URL + movie.posterPath,
             contentDescription = movie.title,
             modifier = Modifier.fillMaxSize(),

@@ -62,7 +62,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavHost(navController: NavHostController = rememberNavController()) {
-    val Movie_Details_ID ="movieId"
+    val Movie_Details_ID = "movieId"
 
     NavHost(navController = navController, startDestination = Screen.Splash.route) {
         composable(Screen.Splash.route) {
@@ -75,7 +75,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             LoginScreen(navController)
         }
         composable(
-            route =  Screen.MovieDetails.route + "/{$Movie_Details_ID}",
+            route = Screen.MovieDetails.route + "/{$Movie_Details_ID}",
             arguments = listOf(navArgument(Movie_Details_ID) { type = NavType.StringType })
         ) { backStackEntry ->
             val movieId = backStackEntry.arguments?.getString(Movie_Details_ID) ?: return@composable
@@ -98,9 +98,11 @@ fun DashBoardScreen(navController: NavHostController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
     var selectedPageIndex by remember { mutableIntStateOf(1) }
-var conext = LocalContext.current
+    var conext = LocalContext.current
     val innerNavController = rememberNavController() // ✅ new navController for inner NavHost
-
+    // PageContent(1)
+    //  TvCategoriesScreen()
+    // TvScreenContent("ProfileScreen")
     val pages = listOf(
         Page("Search", Icons.Default.Search),
         Page("Home", Icons.Default.Home),
@@ -161,11 +163,9 @@ var conext = LocalContext.current
             }
             composable(Screen.SearchScreen.route) {
                 SearchScreen(navController)
-              //  TvCategoriesScreen()
-               // TvScreenContent("ProfileScreen")
+
             }
             composable(Screen.FavoritesScreen.route) {
-               // PageContent(1)
                 FavouriteScreen(navController)
             }
             composable(Screen.SettingsScreen.route) {
@@ -178,15 +178,14 @@ var conext = LocalContext.current
                 AllShowsScreen(navController)
             }
             composable(Screen.MoviesScreen.route) {
-                MoviesContentScreen(navController=navController)
+                MoviesContentScreen(navController = navController)
             }
             composable(Screen.CategoriesScreen.route) {
                 CategoryScreen(navController)
             }
-
-
         }
     }
+
     val currentInnerBackStack by innerNavController.currentBackStackEntryAsState()
     val currentRoute = currentInnerBackStack?.destination?.route
     var showExitDialog by remember { mutableStateOf(false) }

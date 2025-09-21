@@ -1,6 +1,5 @@
 package com.pixeldev.composetv.screens.movie
 
-import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.Composable
@@ -11,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,10 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
@@ -69,6 +65,7 @@ import com.pixeldev.composetv.screens.categories.ErrorStrip
 import com.pixeldev.composetv.screens.home.GenreSection
 import com.pixeldev.composetv.screens.home.HomeViewModel
 import com.pixeldev.composetv.screens.home.MovieSection
+import com.pixeldev.composetv.utlis.CommonImageLoader
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_1280
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_BACKDROP_IMAGE_URL_780
 import com.pixeldev.composetv.utlis.Constants.Companion.BASE_POSTER_IMAGE_URL
@@ -79,8 +76,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MoviesContentScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
-    navController: NavHostController
+    viewModel: HomeViewModel = hiltViewModel(), navController: NavHostController
 ) {
     val discoveryMovieState by viewModel.discoveryMovieResponses.collectAsState()
     val trendingMovieState by viewModel.trendingMovieResponses.collectAsState()
@@ -129,6 +125,26 @@ fun MoviesContentScreen(
             }
 
             allSuccess -> {
+                /******************************************************************************************
+                 * There are TWO UI versions implemented for the Movie Page:
+                 *
+                 * 1️⃣ SetMovieData(...)
+                 *     → First version (commented below)
+                 *     → Visually good, but has a small focus issue related to the immersive listing:
+                 *       - When a row (e.g., Discovery) gains focus, the title/description scrolls off-screen.
+                 *       - Not ideal for immersive experience on TV/large screens.
+                 *
+                 * 2️⃣ ImmersiveMovieList(...)
+                 *     → Improved version (currently active)
+                 *     → Fixes focus issue by keeping the title/description section fixed at the top.
+                 *     → More immersive and better for large display UIs.
+                 *
+                 * ✅ To test both UIs:
+                 *    - Uncomment `SetMovieData(...)` and comment `ImmersiveMovieList(...)` to test first version.
+                 *    - Comment `SetMovieData(...)` and uncomment `ImmersiveMovieList(...)` to test improved version.
+                 ******************************************************************************************/
+
+                /*
                 SetMovieData(
                     discoveryMovie = (discoveryMovieState as MovieState.Success).data,
                     trendingMovie = (trendingMovieState as MovieState.Success).data,
@@ -138,11 +154,202 @@ fun MoviesContentScreen(
                     popularMovie = moviesLazyPagingItems,
                     navController
                 )
+                */
+
+                ImmersiveMovieList(
+                    discoveryMovie = (discoveryMovieState as MovieState.Success).data!!.results,
+                    trendingMovie = (trendingMovieState as MovieState.Success).data!!.results,
+                    nowPlayingMovie = (nowPlayingMovieState as MovieState.Success).data!!.results,
+                    upcomingMovie = (upcomingMovieState as MovieState.Success).data!!.results,
+                    popularMovie = moviesLazyPagingItems,
+                    navController
+                )
 
             }
         }
     }
 }
+/*************************************2️⃣ ImmersiveMovieList(...)*****************************************************/
+
+@Composable
+fun ImmersiveMovieList(
+    discoveryMovie: List<Movies>,
+    trendingMovie: List<Movies>,
+    nowPlayingMovie: List<Movies>,
+    upcomingMovie: List<Movies>,
+    popularMovie: LazyPagingItems<Movies>,
+    navController: NavHostController
+) {
+    var selectedMovie by remember { mutableStateOf(discoveryMovie.firstOrNull()) }
+
+    Box(
+        modifier = Modifier.fillMaxSize()/*.background(Color.Black)*/
+    ) {
+        // Backdrop
+        AsyncImage(
+            model = BASE_BACKDROP_IMAGE_URL_1280 + selectedMovie?.backdropPath,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // Gradient overlay
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Color.Black.copy(alpha = 0.6f), Color.Black)
+                    )
+                )
+        )
+
+        // Main container for scrolling content
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(0.dp),
+            verticalArrangement = Arrangement.spacedBy(32.dp)
+        ) {
+            // Movie details always at the top
+            selectedMovie?.let { movie ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)/* .background(Color.Black.copy(alpha = 0.7f))  // Optional background to make details stand out*/
+                ) {
+                    Column(modifier = Modifier.fillMaxWidth(0.6f)) {
+                        Text(
+                            text = movie.title ?: "",
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = Color.White,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "${movie.releaseDate} • ⭐ ${movie.voteAverage}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.LightGray
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = movie.overview ?: "",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }// Scrollable movie rows
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(32.dp),
+            ) {
+                // --- Multiple rows ---
+                item {
+                    MovieRowSection("Discovery", discoveryMovie, onMovieClick = {
+                        navController.navigate(Screen.MovieDetails.route + "/${it.id}")
+                    }) {
+                        selectedMovie = it
+                    }
+                }
+                item {
+                    MovieRowSection("Trending", trendingMovie, onMovieClick = {
+                        navController.navigate(Screen.MovieDetails.route + "/${it.id}")
+                    }) { selectedMovie = it }
+                }
+                item {
+                    MovieRowSection("Now Playing", nowPlayingMovie, onMovieClick = {
+                        navController.navigate(Screen.MovieDetails.route + "/${it.id}")
+                    }) {
+                        selectedMovie = it
+                    }
+                }
+                item {
+                    MovieRowSection("Upcoming", upcomingMovie, onMovieClick = {
+                        navController.navigate(Screen.MovieDetails.route + "/${it.id}")
+                    }) { selectedMovie = it }
+                }
+                item {
+                    Column {
+                        SectionHeader("Popular Movies (Paging 3)")
+                        ShowPagingMovieList(popularMovie)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MovieRowSection(
+    title: String, movies: List<Movies>, onMovieClick: (Movies) -> Unit, onFocused: (Movies) -> Unit
+) {
+    if (movies.isEmpty()) return
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        SectionHeader(title)
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp)
+        ) {
+            items(movies.size) { movie ->
+                MoviePosterItem(
+                    movie = movies[movie],
+                    onFocused = { onFocused(movies[movie]) },
+                    onClick = { onMovieClick(movies[movie]) })
+            }
+        }
+    }
+}
+
+
+@Composable
+fun MoviePosterItem(
+    movie: Movies, onFocused: () -> Unit, onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .size(140.dp, 200.dp)
+            .onFocusChanged { if (it.isFocused) onFocused() },
+        onClick = { onClick() }) {
+
+        Box(
+            contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
+        ) {
+            CommonImageLoader(
+                imageUrl = BASE_POSTER_IMAGE_URL + movie.posterPath,
+                contentDescription = movie.title,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(alpha = 0.6f))
+                    .padding(6.dp)
+            ) {
+                Text(
+                    text = movie.title ?: "",
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+/*************************************1️⃣ SetMovieData(...) *****************************************************/
 
 @Composable
 fun SetMovieData(
@@ -158,8 +365,8 @@ fun SetMovieData(
     // State to track the focused movie
     val focusedMovie = remember { mutableStateOf<Movies?>(null) }
 
-        val bringIntoViewRequester = remember { BringIntoViewRequester() }
-        val coroutineScope = rememberCoroutineScope()
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val coroutineScope = rememberCoroutineScope()
     // Use a LazyColumn to show the dynamic content below the fixed hero section
     LazyColumn(
         modifier = Modifier.fillMaxSize()
@@ -178,8 +385,7 @@ fun SetMovieData(
                                 bringIntoViewRequester.bringIntoView()
                             }
                         }
-                    }
-            ) {
+                    }) {
                 TopHeroSection(focusedMovie.value)
             }
         }
@@ -199,7 +405,7 @@ fun SetMovieData(
                     items(upcomingMovie!!.results.size) { movieIndex ->
                         val movie = upcomingMovie!!.results[movieIndex]
                         // MovieCard for each movie
-                        MovieCard(movie = movie, onFocus = { focusedMovie.value = movie}) {
+                        MovieCard(movie = movie, onFocus = { focusedMovie.value = movie }) {
                             navController.navigate(Screen.MovieDetails.route + "/${it}")
 
                         }
@@ -212,7 +418,7 @@ fun SetMovieData(
             MovieSection(
                 title = "Discovery Movies",
                 movies = discoveryMovie?.results,
-                onClickMovieCard = {movieId ->
+                onClickMovieCard = { movieId ->
                     navController.navigate(Screen.MovieDetails.route + "/${movieId}")
                 })
         }
@@ -222,17 +428,17 @@ fun SetMovieData(
                 title = "Trending Movies",
                 movies = trendingMovie?.results,
                 onClickMovieCard = { movieId ->
-                    navController.navigate(Screen.MovieDetails.route + "/${movieId}") }
-            )
+                    navController.navigate(Screen.MovieDetails.route + "/${movieId}")
+                })
         }
 
         item {
             MovieSection(
                 title = "Now Playing Movies",
                 movies = nowPlayingMovie?.results,
-                onClickMovieCard = {movieId ->
-                    navController.navigate(Screen.MovieDetails.route + "/${movieId}") }
-            )
+                onClickMovieCard = { movieId ->
+                    navController.navigate(Screen.MovieDetails.route + "/${movieId}")
+                })
         }
 
         item {
@@ -244,8 +450,8 @@ fun SetMovieData(
 
         item {
             Column(Modifier.padding(8.dp)) {
-                GenreSection(genres = genresMovie?.genres,
-                    onClickCard = {
+                GenreSection(
+                    genres = genresMovie?.genres, onClickCard = {
                         navController.navigate(Screen.CategoryDetailsScreen.route)
                     })
             }
@@ -283,8 +489,7 @@ fun ShowPagingMovieList(pagingItem: LazyPagingItems<Movies>) {
                             .aspectRatio(0.6f), // Maintains poster ratio
                     ) {
                         Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.fillMaxSize()
+                            contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
                         ) {
                             AsyncImage(
                                 model = BASE_POSTER_IMAGE_URL + (movie.posterPath ?: ""),
@@ -393,8 +598,7 @@ fun TopHeroSection(movie: Movies?) {
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(context)
-                    .data(BASE_BACKDROP_IMAGE_URL_1280 + movie!!.backdropPath)
-                    .crossfade(true)
+                    .data(BASE_BACKDROP_IMAGE_URL_1280 + movie!!.backdropPath).crossfade(true)
                     .build(),
                 contentDescription = movie.title,
                 contentScale = ContentScale.Crop,
@@ -406,8 +610,7 @@ fun TopHeroSection(movie: Movies?) {
                     .fillMaxSize()
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black),
-                            startY = 200f
+                            colors = listOf(Color.Transparent, Color.Black), startY = 200f
                         )
                     )
             )
@@ -457,8 +660,7 @@ fun TopHeroSection(movie: Movies?) {
                 .background(
                     brush = Brush.verticalGradient(
                         listOf(
-                            Color(0xFF1A1A1A),
-                            Color.Black
+                            Color(0xFF1A1A1A), Color.Black
                         )
                     )
                 )
@@ -475,15 +677,12 @@ fun TopHeroSection(movie: Movies?) {
 
 @Composable
 fun MovieCard(
-    movie: Movies,
-    onFocus: () -> Unit,
-    onClickMovieCard: (movieId: Int) -> Unit
+    movie: Movies, onFocus: () -> Unit, onClickMovieCard: (movieId: Int) -> Unit
 
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isFocused) 1.1f else 1f,
-        label = "CardScale"
+        targetValue = if (isFocused) 1.1f else 1f, label = "CardScale"
     )
 
     Card(
@@ -495,47 +694,43 @@ fun MovieCard(
                 isFocused = it.isFocused
                 if (it.isFocused) onFocus()
             }
-            .focusable(), onClick = {onClickMovieCard(movie.id?:0)}
-    ) {
+            .focusable(), onClick = { onClickMovieCard(movie.id ?: 0) }) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath)
-                .crossfade(true)
-                .build(),
+                .data(BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath).crossfade(true).build(),
             contentDescription = movie.title,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
-        )
-      /*  AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath)
-                .crossfade(true)
-                .listener(
-                    onStart = {
-                        Log.d(
-                            "ImageLoad",
-                            "⏳ Loading: ${BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath}"
-                        )
-                    },
-                    onSuccess = { _, _ ->
-                        Log.d(
-                            "ImageLoad",
-                            "✅ Loaded: ${BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath}"
-                        )
-                    },
-                    onError = { _, result ->
-                        Log.e(
-                            "ImageLoad",
-                            "❌ Error loading: ${BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath}",
-                            result.throwable
-                        )
-                    }
-                )
-                .build(),
-            contentDescription = "Background Poster",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )*/
+        )/*  AsyncImage(
+              model = ImageRequest.Builder(LocalContext.current)
+                  .data(BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath)
+                  .crossfade(true)
+                  .listener(
+                      onStart = {
+                          Log.d(
+                              "ImageLoad",
+                              "⏳ Loading: ${BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath}"
+                          )
+                      },
+                      onSuccess = { _, _ ->
+                          Log.d(
+                              "ImageLoad",
+                              "✅ Loaded: ${BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath}"
+                          )
+                      },
+                      onError = { _, result ->
+                          Log.e(
+                              "ImageLoad",
+                              "❌ Error loading: ${BASE_BACKDROP_IMAGE_URL_780 + movie.backdropPath}",
+                              result.throwable
+                          )
+                      }
+                  )
+                  .build(),
+              contentDescription = "Background Poster",
+              contentScale = ContentScale.Crop,
+              modifier = Modifier.fillMaxSize()
+          )*/
 
     }
 }

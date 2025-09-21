@@ -72,8 +72,9 @@ fun AllShowsScreen(
                 }
 
                 MovieState.Loading -> {
-                    Box {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         TVGradientLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+
                     }
                 }
 
@@ -94,7 +95,8 @@ fun AllShowsScreen(
                 is MovieState.Loading -> {
                     item {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            TVGradientLoadingIndicator()
+                            TVGradientLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+
                         }
                     }
                 }

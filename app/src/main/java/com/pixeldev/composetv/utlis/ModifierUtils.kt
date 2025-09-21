@@ -43,7 +43,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -52,13 +51,11 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.pixeldev.composetv.R
 import com.pixeldev.composetv.data.remote.response.MovieResponse
-import com.pixeldev.composetv.models.Genre
 
 /**
  * Handles horizontal (Left & Right) D-Pad Keys and consumes the event(s) so that the focus doesn't
@@ -327,7 +324,7 @@ fun formatToMillions(number: Long): String {
 }
 
 @Composable
-fun CommonImage(
+fun CommonImageLoader(
     imageUrl: String,
     contentDescription: String?,
     modifier: Modifier = Modifier,
