@@ -1,5 +1,6 @@
 package com.pixeldev.composetv.screens.categories
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -40,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -63,6 +65,7 @@ import coil.compose.AsyncImage
 import com.pixeldev.composetv.utlis.occupyScreenSize
 import com.pixeldev.composetv.R
 import com.pixeldev.composetv.data.remote.response.GenreResponse
+import com.pixeldev.composetv.graph.Screen
 import com.pixeldev.composetv.screens.common.CustomTopBar
 import com.pixeldev.composetv.screens.home.JetStreamCardShape
 import com.pixeldev.composetv.screens.home.HomeViewModel
@@ -103,7 +106,7 @@ fun CategoryDetails(navHostController: NavHostController, viewModel: HomeViewMod
             }
 
             is MovieState.Success<*> -> {
-                PillIndicatorTabRow(state.data as GenreResponse?, viewModel)
+                PillIndicatorTabRow(state.data as GenreResponse?, viewModel, navHostController)
             }
         }
 
@@ -112,7 +115,12 @@ fun CategoryDetails(navHostController: NavHostController, viewModel: HomeViewMod
 }
 
 @Composable
-private fun PillIndicatorTabRow(response: GenreResponse?, viewModel: HomeViewModel) {
+private fun PillIndicatorTabRow(
+    response: GenreResponse?,
+    viewModel: HomeViewModel,
+    navHostController: NavHostController
+) {
+    var context = LocalContext.current
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     Column(
         modifier = Modifier
@@ -165,12 +173,16 @@ private fun PillIndicatorTabRow(response: GenreResponse?, viewModel: HomeViewMod
                 .height(2.dp)
                 .background(MaterialTheme.colorScheme.border.copy(alpha = 0.6f))
         )
-        TabPanels(selectedTabIndex = selectedTabIndex, viewModel)
+        TabPanels(selectedTabIndex = selectedTabIndex, viewModel,navHostController)
     }
 }
 
 @Composable
-private fun TabPanels(selectedTabIndex: Int, viewModel: HomeViewModel) {
+private fun TabPanels(
+    selectedTabIndex: Int,
+    viewModel: HomeViewModel,
+    navHostController: NavHostController
+) {
     AnimatedContent(targetState = selectedTabIndex, label = "") {
         when (it) {
         }
@@ -180,14 +192,14 @@ private fun TabPanels(selectedTabIndex: Int, viewModel: HomeViewModel) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-               /* .background(MaterialTheme.colorScheme.background)*/
+            /* .background(MaterialTheme.colorScheme.background)*/
         ) {
             val listState = rememberLazyGridState()
 
             if (genresWiseMoviePagination == null) {
                 // Show loader jab tak list null hai
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    TVGradientLoadingIndicator()
+                    TVGradientLoadingIndicator(modifier = Modifier.align(Alignment.Center))
                 }
             } else {
                 LazyVerticalGrid(
@@ -198,12 +210,13 @@ private fun TabPanels(selectedTabIndex: Int, viewModel: HomeViewModel) {
                     items(genresWiseMoviePagination.itemCount) { i ->
                         val movie = genresWiseMoviePagination[i]
                         if (movie != null) {
-                             PortraitMovieCard(
-                                 title = movie.title ?: "",
-                                 posterUrl = BASE_POSTER_IMAGE_URL + (movie.posterPath ?: "")
-                             ) {
-                                 // TODO: onClick handle
-                             }
+                            PortraitMovieCard(
+                                title = movie.title ?: "",
+                                posterUrl = BASE_POSTER_IMAGE_URL + (movie.posterPath ?: "")
+                            ) {
+                                navHostController.navigate(Screen.MovieDetails.route + "/${movie.id}")
+
+                            }
                         } else {
                             // Placeholder skeleton / shimmer item
                             Box(
@@ -271,10 +284,10 @@ private fun TabPanels(selectedTabIndex: Int, viewModel: HomeViewModel) {
 }
 
 @Composable
-fun PortraitMovieCard(title: String, posterUrl: String, content: @Composable () -> Unit) {
+fun PortraitMovieCard(title: String, posterUrl: String, onClick: () -> Unit,) {
     BorderedFocusableItem(
         onClick = {
-
+            onClick()
         },
         modifier = Modifier
             .padding(8.dp)

@@ -36,8 +36,6 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -225,7 +223,7 @@ fun SettingScreen(
                     )
                 }
                 composable(Routes.SEARCH_HISTORY) { SearchHistorySection() }
-                composable(Routes.HELP_AND_SUPPORT) { HelpAndSupportSection() }
+                composable(Routes.HELP_AND_SUPPORT) { HelpAndSupportSection(navHostController) }
             }
         )
     }

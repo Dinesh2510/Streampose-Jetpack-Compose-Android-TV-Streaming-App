@@ -72,7 +72,7 @@ object StringConstants {
             const val HelpAndSupportSectionFAQItem = "FAQ's"
             const val HelpAndSupportSectionPrivacyItem = "Privacy Policy"
             const val HelpAndSupportSectionContactItem = "Contact us on"
-            const val HelpAndSupportSectionContactValue = "support@Streampose.com"
+            const val HelpAndSupportSectionContactValue = "support@pixeldev.in"
         }
     }
 }

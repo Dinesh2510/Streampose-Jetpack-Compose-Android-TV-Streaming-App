@@ -17,7 +17,13 @@
 package com.pixeldev.composetv.utlis
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import android.view.KeyEvent
+import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +36,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -43,6 +50,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -50,8 +58,10 @@ import androidx.compose.ui.unit.sp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import coil.size.Size
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.pixeldev.composetv.R
@@ -321,7 +331,7 @@ fun formatToMillions(number: Long): String {
         }
         else -> number.toString()
     }
-}
+}/*
 
 @Composable
 fun CommonImageLoader(
@@ -353,4 +363,96 @@ fun CommonImageLoader(
         placeholder = painter, // Default to 0 if null
         error =painter // Default to 0 if null
     )
+}
+*/
+// Define a TAG for your logs
+private const val TAG = "CoilImageLoader"
+
+@Composable
+fun CommonImageLoader(
+    imageUrl: String,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Crop,
+) {
+    val placeholderPainter = painterResource(id = R.drawable.logo_trans)
+    val errorPainter = painterResource(id = R.drawable.error)
+
+    Log.d(TAG, "Starting image load for URL: $imageUrl")
+
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(imageUrl)
+            .size(Size.ORIGINAL) // Set Coil to load the image at its original resolution
+            .build()
+    )
+
+    Box(
+        modifier = Modifier.fillMaxSize(), // Use fillMaxSize() on the container
+        contentAlignment = Alignment.Center
+    ) {
+        when (painter.state) {
+            is AsyncImagePainter.State.Loading -> {
+                Log.d(TAG, "Image state: Loading")
+                Image(
+                    painter = placeholderPainter,
+                    contentDescription = "Loading placeholder",
+                    modifier = Modifier.fillMaxSize(), // Placeholder fills the container
+                    contentScale = ContentScale.Fit
+                )
+            }
+            is AsyncImagePainter.State.Error -> {
+                val error = (painter.state as AsyncImagePainter.State.Error).result.throwable
+                Log.e(TAG, "Image state: Error. Cause: ${error.message}", error)
+                Image(
+                    painter = errorPainter,
+                    contentDescription = "Error image",
+                    modifier = Modifier.fillMaxSize(), // Error image fills the container
+                    contentScale = ContentScale.Fit
+                )
+            }
+            is AsyncImagePainter.State.Success -> {
+                Log.d(TAG, "Image state: Success. Image loaded.")
+                Image(
+                    painter = painter,
+                    contentDescription = "Loaded image",
+                    modifier = Modifier.fillMaxSize(), // Loaded image fills the container
+                    contentScale = ContentScale.Crop
+                )
+            }
+            else -> {
+                Log.d(TAG, "Image state: Other state")
+            }
+        }
+    }
+}
+
+fun openEmailClient(context: Context, emailAddress: String, subject: String, body: String) {
+    try {
+        // Create the email intent
+        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:$emailAddress") // Ensure it opens in email client
+            putExtra(Intent.EXTRA_SUBJECT, subject)
+            putExtra(Intent.EXTRA_TEXT, body)
+        }
+
+        // Check if there's an app that can handle the intent
+        val packageManager = context.packageManager
+        val emailApps = emailIntent.resolveActivity(packageManager)
+
+        if (emailApps != null) {
+            // Start the email client with the intent
+            context.startActivity(emailIntent)
+        } else {
+            // Handle the case when no email client is available
+            showToast(context, "No email client found.")
+        }
+    } catch (e: Exception) {
+        // Handle exceptions (e.g., network issues, app errors)
+        showToast(context, "Error opening email client: ${e.localizedMessage}")
+    }
+}
+
+fun showToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 }

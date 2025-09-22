@@ -1,7 +1,6 @@
 package com.pixeldev.composetv.graph
 
 import android.app.Activity
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -48,8 +47,6 @@ import com.pixeldev.composetv.screens.details.MovieDetailsScreen
 import com.pixeldev.composetv.screens.favourite.FavouriteScreen
 import com.pixeldev.composetv.screens.home.HomeScreen
 import com.pixeldev.composetv.screens.home.Page
-import com.pixeldev.composetv.screens.home.PageContent
-import com.pixeldev.composetv.screens.home.TvCategoriesScreen
 import com.pixeldev.composetv.screens.home.TvScreenContent
 import com.pixeldev.composetv.screens.login.LoginScreen
 import com.pixeldev.composetv.screens.movie.MoviesContentScreen
@@ -57,6 +54,7 @@ import com.pixeldev.composetv.screens.search.SearchScreen
 import com.pixeldev.composetv.screens.setting.SettingScreen
 import com.pixeldev.composetv.screens.shows.AllShowsScreen
 import com.pixeldev.composetv.screens.splash.SplashScreen
+import com.pixeldev.composetv.screens.webview.MyWebViewScreen
 import com.pixeldev.composetv.utlis.FullScreenDialog
 import kotlinx.coroutines.launch
 
@@ -90,6 +88,15 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         composable(Screen.CategoryDetailsScreen.route) {
             CategoryDetails(navController)
         }
+        // WebView Screen with Parameters
+        composable(
+            route = Screen.WebViewScreen.route
+        ) { backStackEntry ->
+            val webTitle = backStackEntry.arguments?.getString("webTitle") ?: "Default Title"
+            val webUrl = backStackEntry.arguments?.getString("webUrl") ?: "https://www.example.com"
+            MyWebViewScreen(webTitle, webUrl, navController)
+        }
+
     }
 }
 

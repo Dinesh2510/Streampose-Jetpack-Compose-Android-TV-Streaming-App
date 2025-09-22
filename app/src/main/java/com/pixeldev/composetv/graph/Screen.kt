@@ -15,5 +15,5 @@ sealed class Screen(val route: String) {
     object ShowsScreen : Screen("Shows")
     object MovieDetails : Screen("movieDetails")
     object CategoryDetailsScreen : Screen("categoryDetails")
-
+    object WebViewScreen : Screen("webView/{webTitle}/{webUrl}")
 }
