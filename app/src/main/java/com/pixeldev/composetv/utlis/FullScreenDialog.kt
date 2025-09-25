@@ -28,7 +28,10 @@ fun FullScreenDialog(
     onCancel: () -> Unit
 ) {
     val confirmButtonFocusRequester = remember { FocusRequester() }
-
+    // BackHandler for dialog
+    BackHandler(enabled = true) {
+        onCancel()
+        }
     // Automatically request focus when dialog appears
     LaunchedEffect(Unit) {
         confirmButtonFocusRequester.requestFocus()

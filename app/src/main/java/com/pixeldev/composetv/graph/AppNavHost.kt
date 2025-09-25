@@ -1,6 +1,7 @@
 package com.pixeldev.composetv.graph
 
 import android.app.Activity
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Slideshow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +60,8 @@ import com.pixeldev.composetv.screens.splash.SplashScreen
 import com.pixeldev.composetv.screens.webview.MyWebViewScreen
 import com.pixeldev.composetv.utlis.FullScreenDialog
 import kotlinx.coroutines.launch
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 
 @Composable
 fun AppNavHost(navController: NavHostController = rememberNavController()) {
@@ -96,20 +101,17 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             val webUrl = backStackEntry.arguments?.getString("webUrl") ?: "https://www.example.com"
             MyWebViewScreen(webTitle, webUrl, navController)
         }
-
     }
 }
+
 
 @Composable
 fun DashBoardScreen(navController: NavHostController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    var selectedPageIndex by remember { mutableIntStateOf(1) }
-    var conext = LocalContext.current
-    val innerNavController = rememberNavController() // ✅ new navController for inner NavHost
-    // PageContent(1)
-    //  TvCategoriesScreen()
-    // TvScreenContent("ProfileScreen")
+    val context = LocalContext.current
+    val innerNavController = rememberNavController()
+
     val pages = listOf(
         Page("Search", Icons.Default.Search),
         Page("Home", Icons.Default.Home),
@@ -119,6 +121,59 @@ fun DashBoardScreen(navController: NavHostController) {
         Page("Favorite", Icons.Default.Favorite),
         Page("Settings", Icons.Default.Settings),
     )
+
+    // --- Track current route for highlight sync ---
+    val currentBackStack by innerNavController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStack?.destination?.route
+
+    var selectedPageIndex by remember { mutableIntStateOf(1) }
+
+    /*    val selectedPageIndex = pages.indexOfFirst { page ->
+        when (page.title) {
+            "Search" -> currentRoute == Screen.SearchScreen.route
+            "Home" -> currentRoute == Screen.HomeScreen.route
+            "Categories" -> currentRoute == Screen.CategoriesScreen.route
+            "Movies" -> currentRoute == Screen.MoviesScreen.route
+            "Shows" -> currentRoute == Screen.ShowsScreen.route
+            "Favorite" -> currentRoute == Screen.FavoritesScreen.route
+            "Settings" -> currentRoute == Screen.SettingsScreen.route
+            else -> false
+        }
+    }.takeIf { it != -1 } ?: 1 // fallback to Home if unknown
+*/
+// Sync with currentRoute NEW 😎
+    LaunchedEffect(currentRoute) {
+        if (currentRoute == Screen.HomeScreen.route) {
+            // This block runs whenever HomeScreen becomes active
+            Log.d("DashBoard", "HomeScreen is now active")
+        }
+        selectedPageIndex = when (currentRoute) {
+            Screen.SearchScreen.route -> 0
+            Screen.HomeScreen.route -> 1
+            Screen.CategoriesScreen.route -> 2
+            Screen.MoviesScreen.route -> 3
+            Screen.ShowsScreen.route -> 4
+            Screen.FavoritesScreen.route -> 5
+            Screen.SettingsScreen.route -> 6
+            else -> 1
+        }
+    }
+    DisposableEffect(Unit) {
+        Log.d("DashBoard", "DrawerContent composed")
+        onDispose {
+            Log.d("DashBoard", "DrawerContent disposed")
+        }
+    }
+
+    // --- Focus Requesters for TV focus restore ---
+    val focusRequesters = remember { pages.map { FocusRequester() } }
+
+    LaunchedEffect(drawerState.currentValue, selectedPageIndex) {
+        if (drawerState.currentValue == DrawerValue.Open) {
+            focusRequesters[selectedPageIndex].requestFocus()
+            Log.d("DashBoard", "Focus restored on $currentRoute")
+        }
+    }
 
     NavigationDrawer(
         drawerState = drawerState,
@@ -134,13 +189,11 @@ fun DashBoardScreen(navController: NavHostController) {
             ) {
                 pages.forEachIndexed { index, page ->
                     NavigationDrawerItem(
+                        modifier = Modifier.focusRequester(focusRequesters[index]),
                         selected = selectedPageIndex == index,
                         onClick = {
-                            selectedPageIndex = index
-                            coroutineScope.launch {
-                                drawerState.setValue(DrawerValue.Closed)
-                            }
-                            // navigate inside the drawer
+                            selectedPageIndex = index // immediately update state 😎
+                            coroutineScope.launch { drawerState.setValue(DrawerValue.Closed) }
                             innerNavController.navigate(
                                 when (index) {
                                     0 -> Screen.SearchScreen.route
@@ -151,7 +204,11 @@ fun DashBoardScreen(navController: NavHostController) {
                                     5 -> Screen.FavoritesScreen.route
                                     else -> Screen.SettingsScreen.route
                                 }
-                            )
+                            ) {
+                                launchSingleTop = true
+                                restoreState = true
+                                popUpTo(Screen.HomeScreen.route) { saveState = true }
+                            }
                         },
                         leadingContent = { Icon(page.icon, contentDescription = page.title) }
                     ) {
@@ -162,15 +219,14 @@ fun DashBoardScreen(navController: NavHostController) {
         }
     ) {
         NavHost(
-            navController = innerNavController,  // ✅ use inner navController
+            navController = innerNavController,
             startDestination = Screen.HomeScreen.route
         ) {
             composable(Screen.HomeScreen.route) {
-                HomeScreen(navController = navController) // parent navController for app-level navigation
+                HomeScreen(navController = navController) // parent navController
             }
             composable(Screen.SearchScreen.route) {
                 SearchScreen(navController)
-
             }
             composable(Screen.FavoritesScreen.route) {
                 FavouriteScreen(navController)
@@ -193,28 +249,20 @@ fun DashBoardScreen(navController: NavHostController) {
         }
     }
 
-    val currentInnerBackStack by innerNavController.currentBackStackEntryAsState()
-    val currentRoute = currentInnerBackStack?.destination?.route
+    // --- BackHandler logic ---
     var showExitDialog by remember { mutableStateOf(false) }
 
-// ✅ Only one BackHandler — and only show dialog if on HomeScreen
     BackHandler(enabled = true) {
         if (currentRoute == Screen.HomeScreen.route) {
             showExitDialog = true
         } else {
-            // Go back within inner nav stack
-            //innerNavController.popBackStack()
-            // Navigate to HomeScreen instead of popping
             innerNavController.navigate(Screen.HomeScreen.route) {
-                popUpTo(Screen.HomeScreen.route) {
-                    inclusive = false
-                }
+                popUpTo(Screen.HomeScreen.route) { inclusive = false }
                 launchSingleTop = true
             }
         }
     }
 
-// ✅ Show Dialog
     if (showExitDialog) {
         FullScreenDialog(
             title = "Exit app?",
@@ -223,15 +271,13 @@ fun DashBoardScreen(navController: NavHostController) {
             cancelButtonText = "Cancel",
             onConfirm = {
                 showExitDialog = false
-                showExitDialog = false
-                (conext as? Activity)?.finish() // or exitProcess(0) if you want to close app
+                (context as? Activity)?.finish()
             },
             onCancel = {
                 showExitDialog = false
             }
         )
     }
-
 }
 
 

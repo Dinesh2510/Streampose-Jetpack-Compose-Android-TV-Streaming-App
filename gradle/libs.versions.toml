@@ -6,7 +6,7 @@ appcompat = "1.7.1"
 composeBom = "2025.08.01"
 materialIconsExtended = "1.7.8"
 tvFoundation = "1.0.0-alpha12"
-tvMaterial = "1.0.1"
+tvMaterial = "1.1.0-alpha01"
 lifecycleRuntimeKtx = "2.9.3"
 activityCompose = "1.10.1"
 
