@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Compose TV YT"
+rootProject.name = "Streampose TV"
 include(":app")
  
