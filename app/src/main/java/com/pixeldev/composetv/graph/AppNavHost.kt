@@ -1,6 +1,7 @@
 package com.pixeldev.composetv.graph
 
 import android.app.Activity
+import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -62,6 +63,7 @@ import com.pixeldev.composetv.utlis.FullScreenDialog
 import kotlinx.coroutines.launch
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import com.pixeldev.composetv.screens.player.ExoPlayerUI
 
 @Composable
 fun AppNavHost(navController: NavHostController = rememberNavController()) {
@@ -92,6 +94,10 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
 
         composable(Screen.CategoryDetailsScreen.route) {
             CategoryDetails(navController)
+        }
+
+        composable(Screen.PlayerViewScreen.route) {
+            ExoPlayerUI()
         }
         // WebView Screen with Parameters
         composable(

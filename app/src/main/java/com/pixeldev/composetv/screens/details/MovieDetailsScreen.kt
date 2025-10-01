@@ -78,7 +78,7 @@ fun MovieDetailsScreen(
 
     SetDetails(
         navHostController = navHostController,
-        goToMoviePlayer = { },
+        goToMoviePlayer = {navHostController.navigate(Screen.PlayerViewScreen.route) },
         onBackPressed = onBackPressed,
         movieDetailsState = movieDetailsState,
         similarMoviesState = similarMoviesState,
