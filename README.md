@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Assets/ic_logo.png" alt="Streampose Logo" width="200"/>
+  <img src="assets/ic_logo.png" alt="Streampose Logo" width="320"/>
 </p>
 
 <h1 align="center">📺 Streampose - Your TV, Your Stream</h1>
@@ -46,13 +46,11 @@ It demonstrates a clean architecture, scalable codebase, and smooth user experie
 
 ## 📸 Screenshots
 
-> Add your screenshots inside a `/screenshots` folder
-
-![Home Screen](screenshots/home.png)
-![Details Screen](screenshots/details.png)
-![Player Screen](screenshots/player.png)
-
----
+| | | |
+|---|---|---|
+| ![](assets/1.png) | ![](assets/2.png) | ![](assets/3.png) |
+| ![](assets/4.png) | ![](assets/5.png) | ![](assets/6.png) |
+| ![](assets/7.png) | ![](assets/8.png) | ![](assets/9.png) |
 
 ## 🚀 Getting Started
 
