@@ -4,6 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.hilt) apply false
-    id ("org.jetbrains.kotlin.plugin.serialization") version "1.8.10" apply false
+    id ("org.jetbrains.kotlin.plugin.serialization") version "2.3.10" apply false
 
 }

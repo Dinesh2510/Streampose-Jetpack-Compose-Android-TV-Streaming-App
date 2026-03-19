@@ -24,14 +24,15 @@ android {
 
     defaultConfig {
         applicationId = "com.pixeldev.composetv"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
         buildConfigField("String", "API_KEY", "\"${apiKey}\"")
-
     }
+
     android.buildFeatures.buildConfig = true
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -41,13 +42,19 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+
+    // ✅ New Kotlin compiler DSL (replaces kotlinOptions)
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+        }
     }
+
     buildFeatures {
         compose = true
     }
